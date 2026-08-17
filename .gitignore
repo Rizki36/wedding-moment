@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.local
+*.local
+dist/
+dist-ssr/
+.output/
+.vercel/
+.wrangler/
+.tanstack/
+.nitro/
+.vinxi/
+__unconfig*
+*.log
+.DS_Store
+.superpowers/
