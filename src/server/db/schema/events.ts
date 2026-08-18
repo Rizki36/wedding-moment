@@ -3,7 +3,7 @@ import { pgTable, uuid, text, date, timestamp, index } from 'drizzle-orm/pg-core
 export const events = pgTable('events', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
-  ownerId: uuid('owner_id').notNull(),
+  ownerId: text('owner_id').notNull(),
   brideName: text('bride_name').notNull(),
   groomName: text('groom_name').notNull(),
   eventDate: date('event_date').notNull(),

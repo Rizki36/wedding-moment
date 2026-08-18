@@ -15,6 +15,13 @@
       "when": 1786957095088,
       "tag": "0001_yummy_black_tom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787057890301,
+      "tag": "0002_right_enchantress",
+      "breakpoints": true
     }
   ]
 }
