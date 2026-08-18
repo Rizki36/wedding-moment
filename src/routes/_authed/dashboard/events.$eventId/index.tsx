@@ -1,11 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { requireEventOwner } from '../../../../server/auth/guards'
 import { getEvent } from '../../../../server/functions/events'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/')({
   beforeLoad: async ({ params }) => {
-    await requireEventOwner(getRequestHeaders(), params.eventId)
+    await requireEventOwner(params.eventId)
   },
   loader: async ({ params }) => getEvent(params.eventId),
   component: EventOverview,

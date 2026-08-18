@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { db } from '../db/client'
@@ -92,7 +91,10 @@ export async function updateEvent(eventId: string, input: UpdateEventInput) {
  * rendering the page. Route-level guards (`requirePengantin`,
  * `requireEventOwner` in `beforeLoad`) are page-load gating only and do NOT
  * protect the endpoint itself, so each handler re-verifies the session (and
- * ownership, for updates) itself via `getRequestHeaders()`.
+ * ownership, for updates) itself. The guards read the current request's
+ * headers internally (see `guards.ts`'s `getAmbientHeaders`), so no
+ * `getRequestHeaders()` call — and no import of
+ * '@tanstack/react-start/server' — is needed in this file.
  */
 export type CreateEventFormInput = Omit<CreateEventInput, 'ownerId'>
 
@@ -101,7 +103,7 @@ export const createEventFn = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     // Never trust a client-supplied ownerId — derive it from the verified
     // session so a caller cannot create events on behalf of another user.
-    const session = await requirePengantin(getRequestHeaders())
+    const session = await requirePengantin()
     return createEvent({ ...data, ownerId: session.user.id })
   })
 
@@ -110,7 +112,7 @@ export const updateEventFn = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { eventId, ...rest } = data
     // Only the owning pengantin (or an admin) may update this event.
-    await requireEventOwner(getRequestHeaders(), eventId)
+    await requireEventOwner(eventId)
     // Restrict to the whitelisted editable fields — never let ownerId, id,
     // slug, status, retentionDeadline, purgedAt, or timestamps through.
     return updateEvent(eventId, pickEditableFields(rest))

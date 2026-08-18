@@ -68,7 +68,7 @@ describe('updateEventFn security: session + ownership required', () => {
       groomName: 'Bram',
       eventDate: '2026-09-05',
     })
-    await expect(requireEventOwner(new Headers(), event.id)).rejects.toBeDefined()
+    await expect(requireEventOwner(event.id, new Headers())).rejects.toBeDefined()
   })
 
   it('requireEventOwner rejects a real, authenticated non-owner', async () => {
@@ -83,8 +83,8 @@ describe('updateEventFn security: session + ownership required', () => {
     })
 
     // The owner is allowed through.
-    await expect(requireEventOwner(owner.headers, event.id)).resolves.toBeDefined()
+    await expect(requireEventOwner(event.id, owner.headers)).resolves.toBeDefined()
     // A different authenticated pengantin is not.
-    await expect(requireEventOwner(intruder.headers, event.id)).rejects.toBeDefined()
+    await expect(requireEventOwner(event.id, intruder.headers)).rejects.toBeDefined()
   })
 })

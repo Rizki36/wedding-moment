@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { auth } from '../auth/auth'
 import { requireAdmin } from '../auth/guards'
@@ -32,12 +31,15 @@ export async function listPengantin() {
  * independent of any route's `beforeLoad` — a caller can POST to it
  * directly without ever rendering the admin page. Route-level guards are
  * page-load gating only and do NOT protect the endpoint itself, so the
- * handler re-verifies the caller is an authenticated admin via
- * `getRequestHeaders()` before creating an account.
+ * handler re-verifies the caller is an authenticated admin before creating
+ * an account. `requireAdmin` reads the current request's headers
+ * internally (see `guards.ts`'s `getAmbientHeaders`), so no
+ * `getRequestHeaders()` call — and no import of
+ * '@tanstack/react-start/server' — is needed in this file.
  */
 export const createPengantinAccountFn = createServerFn({ method: 'POST' })
   .validator((input: CreatePengantinInput) => input)
   .handler(async ({ data }) => {
-    await requireAdmin(getRequestHeaders())
+    await requireAdmin()
     return createPengantinAccount(data)
   })
