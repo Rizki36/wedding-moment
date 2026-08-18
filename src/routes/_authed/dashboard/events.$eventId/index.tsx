@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { requireEventOwner } from '../../../../server/auth/guards'
 import { getEvent } from '../../../../server/functions/events'
 
@@ -20,7 +20,14 @@ function EventOverview() {
       <p className="text-(--color-fg-muted)">
         {event?.eventDate} — {event?.venue}
       </p>
-      {/* QrCodeCard (Task 10), frames link (Task 9), submissions link (Task 16) added in later tasks */}
+      <Link
+        to="/dashboard/events/$eventId/frames"
+        params={{ eventId: event?.id ?? '' }}
+        className="inline-block mt-4 rounded-full border border-(--color-fg) px-4 py-2"
+      >
+        Kelola Bingkai
+      </Link>
+      {/* QrCodeCard (Task 10), submissions link (Task 16) added in later tasks */}
     </div>
   )
 }
