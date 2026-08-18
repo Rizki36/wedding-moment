@@ -13,9 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as AuthedAdminPengantinIdRouteImport } from './routes/_authed/admin/pengantin.$id'
+import { Route as AuthedAdminPengantinNewRouteImport } from './routes/_authed/admin/pengantin.new'
 import { Route as AuthedDashboardEventsNewRouteImport } from './routes/_authed/dashboard/events.new'
 import { Route as AuthedDashboardEventsEventIdIndexRouteImport } from './routes/_authed/dashboard/events.$eventId/index'
 import { Route as AuthedDashboardEventsEventIdSettingsRouteImport } from './routes/_authed/dashboard/events.$eventId/settings'
@@ -39,10 +43,20 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedAdminRoute,
 } as any)
 const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
   id: '/',
@@ -53,6 +67,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAdminPengantinIdRoute = AuthedAdminPengantinIdRouteImport.update({
+  id: '/pengantin/$id',
+  path: '/pengantin/$id',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedAdminPengantinNewRoute = AuthedAdminPengantinNewRouteImport.update({
+  id: '/pengantin/new',
+  path: '/pengantin/new',
+  getParentRoute: () => AuthedAdminRoute,
 } as any)
 const AuthedDashboardEventsNewRoute =
   AuthedDashboardEventsNewRouteImport.update({
@@ -77,9 +101,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/': typeof AuthedAdminIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
+  '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
@@ -89,7 +117,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin': typeof AuthedAdminIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
+  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
+  '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/dashboard/events/$eventId': typeof AuthedDashboardEventsEventIdIndexRoute
@@ -100,9 +131,13 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_authed/admin': typeof AuthedAdminRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/_authed/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
+  '/_authed/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/_authed/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/_authed/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/_authed/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
@@ -113,9 +148,13 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/admin'
     | '/dashboard'
     | '/api/auth/$'
+    | '/admin/'
     | '/dashboard/'
+    | '/admin/pengantin/$id'
+    | '/admin/pengantin/new'
     | '/dashboard/events/new'
     | '/dashboard/events/$eventId/settings'
     | '/dashboard/events/$eventId/'
@@ -125,7 +164,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/api/auth/$'
+    | '/admin'
     | '/dashboard'
+    | '/admin/pengantin/$id'
+    | '/admin/pengantin/new'
     | '/dashboard/events/new'
     | '/dashboard/events/$eventId/settings'
     | '/dashboard/events/$eventId'
@@ -135,9 +177,13 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/login'
     | '/register'
+    | '/_authed/admin'
     | '/_authed/dashboard'
     | '/api/auth/$'
+    | '/_authed/admin/'
     | '/_authed/dashboard/'
+    | '/_authed/admin/pengantin/$id'
+    | '/_authed/admin/pengantin/new'
     | '/_authed/dashboard/events/new'
     | '/_authed/dashboard/events/$eventId/settings'
     | '/_authed/dashboard/events/$eventId/'
@@ -181,12 +227,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/': {
+      id: '/_authed/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthedAdminIndexRouteImport
+      parentRoute: typeof AuthedAdminRoute
     }
     '/_authed/dashboard/': {
       id: '/_authed/dashboard/'
@@ -201,6 +261,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/admin/pengantin/$id': {
+      id: '/_authed/admin/pengantin/$id'
+      path: '/pengantin/$id'
+      fullPath: '/admin/pengantin/$id'
+      preLoaderRoute: typeof AuthedAdminPengantinIdRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/pengantin/new': {
+      id: '/_authed/admin/pengantin/new'
+      path: '/pengantin/new'
+      fullPath: '/admin/pengantin/new'
+      preLoaderRoute: typeof AuthedAdminPengantinNewRouteImport
+      parentRoute: typeof AuthedAdminRoute
     }
     '/_authed/dashboard/events/new': {
       id: '/_authed/dashboard/events/new'
@@ -226,6 +300,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthedAdminRouteChildren {
+  AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
+  AuthedAdminPengantinIdRoute: typeof AuthedAdminPengantinIdRoute
+  AuthedAdminPengantinNewRoute: typeof AuthedAdminPengantinNewRoute
+}
+
+const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
+  AuthedAdminIndexRoute: AuthedAdminIndexRoute,
+  AuthedAdminPengantinIdRoute: AuthedAdminPengantinIdRoute,
+  AuthedAdminPengantinNewRoute: AuthedAdminPengantinNewRoute,
+}
+
+const AuthedAdminRouteWithChildren = AuthedAdminRoute._addFileChildren(
+  AuthedAdminRouteChildren,
+)
+
 interface AuthedDashboardRouteChildren {
   AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
   AuthedDashboardEventsNewRoute: typeof AuthedDashboardEventsNewRoute
@@ -247,10 +337,12 @@ const AuthedDashboardRouteWithChildren = AuthedDashboardRoute._addFileChildren(
 )
 
 interface AuthedRouteChildren {
+  AuthedAdminRoute: typeof AuthedAdminRouteWithChildren
   AuthedDashboardRoute: typeof AuthedDashboardRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdminRoute: AuthedAdminRouteWithChildren,
   AuthedDashboardRoute: AuthedDashboardRouteWithChildren,
 }
 
