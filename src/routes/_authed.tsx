@@ -4,7 +4,8 @@ import { getSessionOrRedirect } from '../server/auth/guards'
 
 export const Route = createFileRoute('/_authed')({
   beforeLoad: async () => {
-    await getSessionOrRedirect(getRequestHeaders())
+    const session = await getSessionOrRedirect(getRequestHeaders())
+    return { session }
   },
   component: () => <Outlet />,
 })

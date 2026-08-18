@@ -14,7 +14,11 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as AuthedDashboardEventsNewRouteImport } from './routes/_authed/dashboard/events.new'
+import { Route as AuthedDashboardEventsEventIdIndexRouteImport } from './routes/_authed/dashboard/events.$eventId/index'
+import { Route as AuthedDashboardEventsEventIdSettingsRouteImport } from './routes/_authed/dashboard/events.$eventId/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,25 +44,55 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedDashboardRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedDashboardEventsNewRoute =
+  AuthedDashboardEventsNewRouteImport.update({
+    id: '/events/new',
+    path: '/events/new',
+    getParentRoute: () => AuthedDashboardRoute,
+  } as any)
+const AuthedDashboardEventsEventIdIndexRoute =
+  AuthedDashboardEventsEventIdIndexRouteImport.update({
+    id: '/events/$eventId/',
+    path: '/events/$eventId/',
+    getParentRoute: () => AuthedDashboardRoute,
+  } as any)
+const AuthedDashboardEventsEventIdSettingsRoute =
+  AuthedDashboardEventsEventIdSettingsRouteImport.update({
+    id: '/events/$eventId/settings',
+    path: '/events/$eventId/settings',
+    getParentRoute: () => AuthedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/dashboard': typeof AuthedDashboardRoute
+  '/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
+  '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/dashboard': typeof AuthedDashboardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard': typeof AuthedDashboardIndexRoute
+  '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
+  '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/dashboard/events/$eventId': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,14 +100,35 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/_authed/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
+  '/_authed/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/_authed/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/dashboard' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/api/auth/$'
+    | '/dashboard/'
+    | '/dashboard/events/new'
+    | '/dashboard/events/$eventId/settings'
+    | '/dashboard/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/dashboard' | '/api/auth/$'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/api/auth/$'
+    | '/dashboard'
+    | '/dashboard/events/new'
+    | '/dashboard/events/$eventId/settings'
+    | '/dashboard/events/$eventId'
   id:
     | '__root__'
     | '/'
@@ -82,6 +137,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authed/dashboard'
     | '/api/auth/$'
+    | '/_authed/dashboard/'
+    | '/_authed/dashboard/events/new'
+    | '/_authed/dashboard/events/$eventId/settings'
+    | '/_authed/dashboard/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/dashboard/': {
+      id: '/_authed/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthedDashboardIndexRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -136,15 +202,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/dashboard/events/new': {
+      id: '/_authed/dashboard/events/new'
+      path: '/events/new'
+      fullPath: '/dashboard/events/new'
+      preLoaderRoute: typeof AuthedDashboardEventsNewRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
+    '/_authed/dashboard/events/$eventId/': {
+      id: '/_authed/dashboard/events/$eventId/'
+      path: '/events/$eventId'
+      fullPath: '/dashboard/events/$eventId/'
+      preLoaderRoute: typeof AuthedDashboardEventsEventIdIndexRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
+    '/_authed/dashboard/events/$eventId/settings': {
+      id: '/_authed/dashboard/events/$eventId/settings'
+      path: '/events/$eventId/settings'
+      fullPath: '/dashboard/events/$eventId/settings'
+      preLoaderRoute: typeof AuthedDashboardEventsEventIdSettingsRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
   }
 }
 
+interface AuthedDashboardRouteChildren {
+  AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
+  AuthedDashboardEventsNewRoute: typeof AuthedDashboardEventsNewRoute
+  AuthedDashboardEventsEventIdSettingsRoute: typeof AuthedDashboardEventsEventIdSettingsRoute
+  AuthedDashboardEventsEventIdIndexRoute: typeof AuthedDashboardEventsEventIdIndexRoute
+}
+
+const AuthedDashboardRouteChildren: AuthedDashboardRouteChildren = {
+  AuthedDashboardIndexRoute: AuthedDashboardIndexRoute,
+  AuthedDashboardEventsNewRoute: AuthedDashboardEventsNewRoute,
+  AuthedDashboardEventsEventIdSettingsRoute:
+    AuthedDashboardEventsEventIdSettingsRoute,
+  AuthedDashboardEventsEventIdIndexRoute:
+    AuthedDashboardEventsEventIdIndexRoute,
+}
+
+const AuthedDashboardRouteWithChildren = AuthedDashboardRoute._addFileChildren(
+  AuthedDashboardRouteChildren,
+)
+
 interface AuthedRouteChildren {
-  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedDashboardRoute: typeof AuthedDashboardRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedDashboardRoute: AuthedDashboardRouteWithChildren,
 }
 
 const AuthedRouteWithChildren =
