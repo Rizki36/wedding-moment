@@ -1,8 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { db } from '../db/client'
 import { events } from '../db/schema'
+import { requireEventOwner, requirePengantin } from '../auth/guards'
 
 export type CreateEventInput = {
   ownerId: string
@@ -13,6 +15,21 @@ export type CreateEventInput = {
 }
 
 export type UpdateEventInput = Partial<Omit<CreateEventInput, 'ownerId'>>
+
+/** Fields a caller is allowed to change through `updateEventFn`. Deliberately
+ * excludes `ownerId`, `id`, `slug`, `status`, `retentionDeadline`, `purgedAt`,
+ * and timestamps — those are never client-editable. */
+const EDITABLE_UPDATE_FIELDS = ['brideName', 'groomName', 'eventDate', 'venue'] as const
+
+function pickEditableFields(input: Record<string, unknown>): UpdateEventInput {
+  const result: UpdateEventInput = {}
+  for (const key of EDITABLE_UPDATE_FIELDS) {
+    if (key in input) {
+      ;(result as Record<string, unknown>)[key] = input[key]
+    }
+  }
+  return result
+}
 
 /**
  * Core DB logic — plain async functions so they can be unit-tested directly
@@ -69,14 +86,32 @@ export async function updateEvent(eventId: string, input: UpdateEventInput) {
  * Client-safe entry points. These run through TanStack Start's server
  * function RPC boundary, so they are the ones the New Event / Settings
  * route components call from their `onSubmit` handlers.
+ *
+ * IMPORTANT: these are network-reachable RPC endpoints independent of any
+ * route's `beforeLoad` — a caller can POST to them directly without ever
+ * rendering the page. Route-level guards (`requirePengantin`,
+ * `requireEventOwner` in `beforeLoad`) are page-load gating only and do NOT
+ * protect the endpoint itself, so each handler re-verifies the session (and
+ * ownership, for updates) itself via `getRequestHeaders()`.
  */
+export type CreateEventFormInput = Omit<CreateEventInput, 'ownerId'>
+
 export const createEventFn = createServerFn({ method: 'POST' })
-  .validator((input: CreateEventInput) => input)
-  .handler(async ({ data }) => createEvent(data))
+  .validator((input: CreateEventFormInput) => input)
+  .handler(async ({ data }) => {
+    // Never trust a client-supplied ownerId — derive it from the verified
+    // session so a caller cannot create events on behalf of another user.
+    const session = await requirePengantin(getRequestHeaders())
+    return createEvent({ ...data, ownerId: session.user.id })
+  })
 
 export const updateEventFn = createServerFn({ method: 'POST' })
-  .validator((input: { eventId: string } & UpdateEventInput) => input)
+  .validator((input: { eventId: string } & Record<string, unknown>) => input)
   .handler(async ({ data }) => {
     const { eventId, ...rest } = data
-    return updateEvent(eventId, rest)
+    // Only the owning pengantin (or an admin) may update this event.
+    await requireEventOwner(getRequestHeaders(), eventId)
+    // Restrict to the whitelisted editable fields — never let ownerId, id,
+    // slug, status, retentionDeadline, purgedAt, or timestamps through.
+    return updateEvent(eventId, pickEditableFields(rest))
   })

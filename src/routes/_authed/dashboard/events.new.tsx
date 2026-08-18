@@ -5,7 +5,6 @@ import { createEventFn } from '../../../server/functions/events'
 export const Route = createFileRoute('/_authed/dashboard/events/new')({ component: NewEventPage })
 
 function NewEventPage() {
-  const { session } = Route.useRouteContext()
   const navigate = useNavigate()
   const [brideName, setBrideName] = useState('')
   const [groomName, setGroomName] = useState('')
@@ -18,7 +17,7 @@ function NewEventPage() {
     setError(null)
     try {
       const event = await createEventFn({
-        data: { ownerId: session.user.id, brideName, groomName, eventDate, venue },
+        data: { brideName, groomName, eventDate, venue },
       })
       navigate({ to: '/dashboard/events/$eventId', params: { eventId: event.id } })
     } catch {
