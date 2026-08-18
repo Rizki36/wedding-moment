@@ -14,13 +14,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1111.0",
-    "@aws-sdk/s3-request-presigner": "^3.1111.0",
     "@headlessui/react": "^2.2.10",
     "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
+    "aws4fetch": "^1.0.20",
     "better-auth": "^1.6.29",
     "drizzle-orm": "^0.45.2",
     "nanoid": "^6.0.1",
