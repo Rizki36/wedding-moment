@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { resizeAndCompress } from '#/lib/image'
+import { Button } from '#/components/ui/Button'
 
 export function CameraCapture({ onCapture }: { onCapture: (blob: Blob) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -46,20 +47,16 @@ export function CameraCapture({ onCapture }: { onCapture: (blob: Blob) => void }
         className="w-full aspect-[3/4] object-cover rounded-t-full"
       />
       <div className="flex justify-center gap-4 p-4">
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setFacingMode((m) => (m === 'user' ? 'environment' : 'user'))}
-          className="rounded-full border border-(--color-fg) px-4 py-2"
         >
           Balik Kamera
-        </button>
-        <button
-          type="button"
-          onClick={handleShutter}
-          className="rounded-full bg-(--color-fg) text-white px-6 py-2"
-        >
+        </Button>
+        <Button type="button" onClick={handleShutter}>
           Ambil Foto
-        </button>
+        </Button>
       </div>
     </div>
   )

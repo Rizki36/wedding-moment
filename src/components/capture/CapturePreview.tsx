@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { ArchImage } from '#/components/ui/ArchImage'
+import { Button } from '#/components/ui/Button'
 
 export function CapturePreview({
   photoBlob,
@@ -28,39 +30,23 @@ export function CapturePreview({
   return (
     <div className="flex flex-col items-center gap-4 p-6">
       {photoUrl && (
-        <img src={photoUrl} alt="Pratinjau foto" className="w-full max-w-sm rounded-t-full" />
+        <ArchImage src={photoUrl} alt="Pratinjau foto" className="w-full max-w-sm aspect-[3/4]" />
       )}
       <audio src={audioUrl} controls />
       <div className="flex gap-3 flex-wrap justify-center">
-        <button
-          type="button"
-          onClick={onRetakePhoto}
-          className="rounded-full border border-(--color-fg) px-4 py-2"
-        >
+        <Button type="button" variant="outline" onClick={onRetakePhoto}>
           Ulangi Foto
-        </button>
-        <button
-          type="button"
-          onClick={onReRecordAudio}
-          className="rounded-full border border-(--color-fg) px-4 py-2"
-        >
+        </Button>
+        <Button type="button" variant="outline" onClick={onReRecordAudio}>
           Rekam Ulang
-        </button>
-        <button
-          type="button"
-          onClick={onDownloadPhoto}
-          className="rounded-full border border-(--color-fg) px-4 py-2"
-        >
+        </Button>
+        <Button type="button" variant="outline" onClick={onDownloadPhoto}>
           Unduh Foto
-        </button>
+        </Button>
       </div>
-      <button
-        type="button"
-        onClick={onSubmit}
-        className="rounded-full bg-(--color-fg) text-white px-8 py-3"
-      >
+      <Button type="button" onClick={onSubmit} className="!px-8">
         Kirim
-      </button>
+      </Button>
     </div>
   )
 }

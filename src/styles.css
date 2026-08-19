@@ -1,9 +1,11 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap");
 
 @theme {
   --color-bg: #e8e6e1;
   --color-fg: #1a2e1a;
   --color-fg-muted: #3f4f3f;
+  --color-accent: #e8425a;
   --font-display: "Fraunces", serif;
   --font-sans: "Inter", sans-serif;
 }

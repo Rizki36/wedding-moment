@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { getEventFn } from '../../../../server/functions/events'
 import { QrCodeCard } from '../../../../components/dashboard/QrCodeCard'
+import { LinkButton } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/')({
   beforeLoad: async ({ params }) => {
@@ -21,20 +22,22 @@ function EventOverview() {
       <p className="text-(--color-fg-muted)">
         {event?.eventDate} — {event?.venue}
       </p>
-      <Link
+      <LinkButton
         to="/dashboard/events/$eventId/frames"
         params={{ eventId: event?.id ?? '' }}
-        className="inline-block mt-4 rounded-full border border-(--color-fg) px-4 py-2"
+        variant="outline"
+        className="mt-4"
       >
         Kelola Bingkai
-      </Link>
-      <Link
+      </LinkButton>
+      <LinkButton
         to="/dashboard/events/$eventId/submissions"
         params={{ eventId: event?.id ?? '' }}
-        className="inline-block mt-4 ml-2 rounded-full border border-(--color-fg) px-4 py-2"
+        variant="outline"
+        className="mt-4 ml-2"
       >
         Lihat Ucapan Tamu
-      </Link>
+      </LinkButton>
       {event && <QrCodeCard eventId={event.id} slug={event.slug} />}
     </div>
   )

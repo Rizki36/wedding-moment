@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { pickSupportedMimeType } from '#/lib/audio-mime'
 import { MAX_AUDIO_SECONDS } from '#/lib/constants'
+import { Button } from '#/components/ui/Button'
 
 export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeType: string) => void }) {
   const [recording, setRecording] = useState(false)
@@ -86,13 +87,9 @@ export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeTyp
     return (
       <div className="flex flex-col items-center gap-3 p-4">
         <audio src={audioUrl} controls />
-        <button
-          type="button"
-          onClick={reRecord}
-          className="rounded-full border border-(--color-fg) px-4 py-2"
-        >
+        <Button type="button" variant="outline" onClick={reRecord}>
           Rekam Ulang
-        </button>
+        </Button>
       </div>
     )
   }
@@ -102,22 +99,14 @@ export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeTyp
       {recording ? (
         <>
           <p className="text-(--color-fg)">Merekam... {secondsLeft}s</p>
-          <button
-            type="button"
-            onClick={stopRecording}
-            className="rounded-full bg-red-600 text-white px-6 py-2"
-          >
+          <Button type="button" onClick={stopRecording} className="!bg-red-600">
             Berhenti
-          </button>
+          </Button>
         </>
       ) : (
-        <button
-          type="button"
-          onClick={startRecording}
-          className="rounded-full bg-(--color-fg) text-white px-6 py-2"
-        >
+        <Button type="button" onClick={startRecording}>
           Rekam Pesan Suara (maks {MAX_AUDIO_SECONDS}s)
-        </button>
+        </Button>
       )}
     </div>
   )

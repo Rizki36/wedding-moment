@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { createEventFn } from '../../../server/functions/events'
+import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/dashboard/events/new')({ component: NewEventPage })
 
@@ -56,9 +57,7 @@ function NewEventPage() {
         className="border rounded px-3 py-2"
       />
       {error && <p className="text-red-600 text-sm">{error}</p>}
-      <button type="submit" className="rounded-full bg-(--color-fg) text-white py-2">
-        Simpan
-      </button>
+      <Button type="submit">Simpan</Button>
     </form>
   )
 }

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { createPengantinAccountFn } from '../../../server/functions/users'
+import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/admin/pengantin/new')({ component: NewPengantinPage })
 
@@ -52,9 +53,7 @@ function NewPengantinPage() {
         Beri tahu kredensial ini secara manual kepada pengantin (chat/telepon).
       </p>
       {error && <p className="text-red-600 text-sm">{error}</p>}
-      <button type="submit" className="rounded-full bg-(--color-fg) text-white py-2">
-        Buat Akun
-      </button>
+      <Button type="submit">Buat Akun</Button>
     </form>
   )
 }

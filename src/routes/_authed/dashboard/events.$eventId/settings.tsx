@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { getEventFn, updateEventFn } from '../../../../server/functions/events'
+import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/settings')({
   beforeLoad: async ({ params }) => {
@@ -33,9 +34,7 @@ function EventSettings() {
         className="border rounded px-3 py-2"
       />
       {saved && <p className="text-sm text-(--color-fg-muted)">Tersimpan.</p>}
-      <button type="submit" className="rounded-full bg-(--color-fg) text-white py-2">
-        Simpan
-      </button>
+      <Button type="submit">Simpan</Button>
     </form>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button } from '#/components/ui/Button'
 
 export function GuestNameForm({ onSubmit }: { onSubmit: (name: string) => void }) {
   const [name, setName] = useState('')
@@ -16,11 +17,9 @@ export function GuestNameForm({ onSubmit }: { onSubmit: (name: string) => void }
         onChange={(e) => setName(e.target.value)}
         placeholder="Nama Anda"
         required
-        className="border rounded-full px-4 py-3"
+        className="border border-(--color-fg)/30 rounded-full px-4 py-3 bg-(--color-bg) text-(--color-fg)"
       />
-      <button type="submit" className="rounded-full bg-(--color-fg) text-white py-3">
-        Lanjut
-      </button>
+      <Button type="submit">Lanjut</Button>
     </form>
   )
 }

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { listMyEventsFn } from '../../../server/functions/events'
+import { LinkButton } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/dashboard/')({
   loader: async () => listMyEventsFn(),
@@ -12,9 +13,7 @@ function DashboardHome() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="font-(--font-display) text-3xl text-(--color-fg)">Acara Saya</h1>
-        <Link to="/dashboard/events/new" className="rounded-full bg-(--color-fg) text-white px-4 py-2">
-          Buat Acara
-        </Link>
+        <LinkButton to="/dashboard/events/new">Buat Acara</LinkButton>
       </div>
       <ul className="grid gap-4">
         {events.map((event) => (

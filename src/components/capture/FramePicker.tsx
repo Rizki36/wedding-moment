@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { RadioGroup, Radio } from '@headlessui/react'
+import { Button } from '#/components/ui/Button'
 
 type Frame = { id: string; name: string | null; objectKey: string }
 
@@ -13,10 +15,15 @@ export function FramePicker({
   onChange: (frameId: string | null) => void
   onSkip: () => void
 }) {
-  if (frames.length === 0) {
-    onSkip()
-    return null
-  }
+  // `onSkip` mutates parent state, so it must run as an effect, not during
+  // render — calling it synchronously in the render body (the pre-Task-20
+  // shape of this component) works today but violates React's render-purity
+  // rules and emits a dev-mode warning.
+  useEffect(() => {
+    if (frames.length === 0) onSkip()
+  }, [frames, onSkip])
+
+  if (frames.length === 0) return null
 
   return (
     <div className="p-6">
@@ -34,9 +41,9 @@ export function FramePicker({
           </Radio>
         ))}
       </RadioGroup>
-      <button onClick={onSkip} className="mt-4 rounded-full border border-(--color-fg) px-4 py-2">
+      <Button type="button" variant="outline" onClick={onSkip} className="mt-4">
         Tanpa Bingkai
-      </button>
+      </Button>
     </div>
   )
 }
