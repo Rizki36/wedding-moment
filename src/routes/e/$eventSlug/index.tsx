@@ -1,11 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
+import { nanoid } from 'nanoid'
 import { getEventBySlug } from '../../../server/functions/events'
 import { listFramesForEvent } from '../../../server/functions/frames'
 import { getPresignedGetUrl } from '../../../server/storage/presign'
+import { createSubmissionFn } from '../../../server/functions/submissions'
 import { GuestNameForm } from '../../../components/capture/GuestNameForm'
 import { FramePicker } from '../../../components/capture/FramePicker'
+import { CameraCapture } from '../../../components/capture/CameraCapture'
+import { AudioRecorder } from '../../../components/capture/AudioRecorder'
+import { CapturePreview } from '../../../components/capture/CapturePreview'
+import { compositePhotoWithFrame } from '../../../components/capture/FrameOverlayCanvas'
+import { extensionForMimeType } from '../../../lib/audio-mime'
 
 /**
  * Fully public/unauthenticated route — guests never log in, so this route
@@ -70,11 +77,155 @@ function GuestLandingPage() {
     return <FramePicker frames={frames} value={frameId} onChange={setFrameId} onSkip={() => setStep('capture')} />
   }
 
-  // step === 'capture': the real camera/audio capture flow is wired up in
-  // Tasks 12-15. This is intentionally a placeholder.
+  // step === 'capture'
+  const selectedFrame = frames.find((f) => f.id === frameId)
   return (
-    <div className="p-8">
-      Capture flow untuk {guestName} (frame: {frameId ?? 'tanpa bingkai'})
+    <CaptureStep
+      eventId={event.id}
+      eventSlug={event.slug}
+      guestName={guestName}
+      frameId={frameId}
+      frameUrl={selectedFrame?.objectKey ?? null}
+    />
+  )
+}
+
+type CaptureSubStep = 'photo' | 'audio' | 'preview'
+
+/**
+ * Sequences camera capture -> audio recording -> preview/submit for a
+ * guest. This is a plain client component (not a loader/`beforeLoad`), so
+ * it's already only ever rendered in the browser — but it still must not
+ * touch `db`/R2 credentials directly. It only ever reaches those through
+ * two already-guarded network boundaries: the `/api/uploads/presign` API
+ * route (extended in this task to accept `kind: 'submission-photo' |
+ * 'submission-audio'`) for uploading blobs, and `createSubmissionFn` (a
+ * `createServerFn`) for writing the submission row — both re-verify the
+ * target event is `active` server-side, since guests are anonymous and
+ * this component's calls are network-reachable independent of this route's
+ * loader.
+ */
+function CaptureStep({
+  eventId,
+  eventSlug,
+  guestName,
+  frameId,
+  frameUrl,
+}: {
+  eventId: string
+  eventSlug: string
+  guestName: string
+  frameId: string | null
+  frameUrl: string | null
+}) {
+  const navigate = useNavigate()
+  const [subStep, setSubStep] = useState<CaptureSubStep>('photo')
+  const [photoBlob, setPhotoBlob] = useState<Blob | null>(null)
+  const [compositedBlob, setCompositedBlob] = useState<Blob | null>(null)
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [audioMimeType, setAudioMimeType] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handlePhotoCapture(blob: Blob) {
+    setPhotoBlob(blob)
+    const composited = await compositePhotoWithFrame(blob, frameUrl)
+    setCompositedBlob(composited)
+    setSubStep('audio')
+  }
+
+  function handleAudioRecorded(blob: Blob, mimeType: string) {
+    setAudioBlob(blob)
+    setAudioMimeType(mimeType)
+    setAudioUrl(URL.createObjectURL(blob))
+    setSubStep('preview')
+  }
+
+  function handleRetakePhoto() {
+    setPhotoBlob(null)
+    setCompositedBlob(null)
+    setSubStep('photo')
+  }
+
+  function handleReRecordAudio() {
+    setAudioBlob(null)
+    setAudioUrl(null)
+    setSubStep('audio')
+  }
+
+  function handleDownloadPhoto() {
+    if (!compositedBlob) return
+    const url = URL.createObjectURL(compositedBlob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'wedding-moment.jpg'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function uploadToR2(
+    kind: 'submission-photo' | 'submission-audio',
+    submissionId: string,
+    blob: Blob,
+    contentType: string,
+    ext?: string,
+  ) {
+    const presignRes = await fetch('/api/uploads/presign', {
+      method: 'POST',
+      body: JSON.stringify({ kind, eventId, submissionId, contentType, ext }),
+    })
+    if (!presignRes.ok) throw new Error('Gagal mendapatkan izin unggah.')
+    const { url, key } = await presignRes.json()
+    const putRes = await fetch(url, { method: 'PUT', body: blob, headers: { 'Content-Type': contentType } })
+    if (!putRes.ok) throw new Error('Gagal mengunggah berkas.')
+    return key
+  }
+
+  async function handleSubmit() {
+    if (!compositedBlob || !audioBlob) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      const submissionId = nanoid(12)
+      const photoKey = await uploadToR2('submission-photo', submissionId, compositedBlob, 'image/jpeg')
+      const ext = extensionForMimeType(audioMimeType)
+      const audioContentType = audioMimeType || 'audio/webm'
+      const audioKey = await uploadToR2('submission-audio', submissionId, audioBlob, audioContentType, ext)
+
+      await createSubmissionFn({
+        data: {
+          eventId,
+          guestName,
+          frameId,
+          photoObjectKey: photoKey,
+          audioObjectKey: audioKey,
+        },
+      })
+
+      navigate({ to: '/e/$eventSlug/thank-you', params: { eventSlug } })
+    } catch {
+      setError('Gagal mengirim. Silakan coba lagi.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (subStep === 'photo') return <CameraCapture onCapture={handlePhotoCapture} />
+  if (subStep === 'audio') return <AudioRecorder onRecorded={handleAudioRecorded} />
+
+  return (
+    <div>
+      <CapturePreview
+        photoBlob={compositedBlob ?? photoBlob!}
+        audioUrl={audioUrl!}
+        onRetakePhoto={handleRetakePhoto}
+        onReRecordAudio={handleReRecordAudio}
+        onDownloadPhoto={handleDownloadPhoto}
+        onSubmit={handleSubmit}
+      />
+      {submitting && <p className="text-center text-(--color-fg-muted)">Mengirim...</p>}
+      {error && <p className="text-center text-red-600">{error}</p>}
     </div>
   )
 }

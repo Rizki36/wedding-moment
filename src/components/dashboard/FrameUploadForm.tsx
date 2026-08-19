@@ -17,7 +17,7 @@ export function FrameUploadForm({ eventId, onUploaded }: { eventId: string; onUp
       const frameId = nanoid(10)
       const presignRes = await fetch('/api/uploads/presign', {
         method: 'POST',
-        body: JSON.stringify({ eventId, frameId, contentType: file.type }),
+        body: JSON.stringify({ kind: 'frame', eventId, frameId, contentType: file.type }),
       })
       if (!presignRes.ok) {
         alert('Gagal mendapatkan izin unggah.')

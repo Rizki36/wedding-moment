@@ -21,6 +21,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 import { Route as ApiQrChar123eventIdChar125DotpngRouteImport } from './routes/api/qr.{$eventId}[.]png'
 import { Route as ApiUploadsPresignRouteImport } from './routes/api/uploads.presign'
 import { Route as EEventSlugIndexRouteImport } from './routes/e/$eventSlug/index'
+import { Route as EEventSlugThankYouRouteImport } from './routes/e/$eventSlug/thank-you'
 import { Route as AuthedAdminPengantinIdRouteImport } from './routes/_authed/admin/pengantin.$id'
 import { Route as AuthedAdminPengantinNewRouteImport } from './routes/_authed/admin/pengantin.new'
 import { Route as AuthedDashboardEventsNewRouteImport } from './routes/_authed/dashboard/events.new'
@@ -89,6 +90,11 @@ const EEventSlugIndexRoute = EEventSlugIndexRouteImport.update({
   path: '/e/$eventSlug/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EEventSlugThankYouRoute = EEventSlugThankYouRouteImport.update({
+  id: '/e/$eventSlug/thank-you',
+  path: '/e/$eventSlug/thank-you',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedAdminPengantinIdRoute = AuthedAdminPengantinIdRouteImport.update({
   id: '/pengantin/$id',
   path: '/pengantin/$id',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
+  '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
   '/admin/': typeof AuthedAdminIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug/': typeof EEventSlugIndexRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
+  '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
   '/admin': typeof AuthedAdminIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug': typeof EEventSlugIndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
+  '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug/': typeof EEventSlugIndexRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
+    | '/e/$eventSlug/thank-you'
     | '/admin/'
     | '/dashboard/'
     | '/e/$eventSlug/'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
+    | '/e/$eventSlug/thank-you'
     | '/admin'
     | '/dashboard'
     | '/e/$eventSlug'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
+    | '/e/$eventSlug/thank-you'
     | '/_authed/admin/'
     | '/_authed/dashboard/'
     | '/e/$eventSlug/'
@@ -260,6 +272,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiQrChar123eventIdChar125DotpngRoute: typeof ApiQrChar123eventIdChar125DotpngRoute
   ApiUploadsPresignRoute: typeof ApiUploadsPresignRoute
+  EEventSlugThankYouRoute: typeof EEventSlugThankYouRoute
   EEventSlugIndexRoute: typeof EEventSlugIndexRoute
 }
 
@@ -347,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/e/$eventSlug'
       fullPath: '/e/$eventSlug/'
       preLoaderRoute: typeof EEventSlugIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/e/$eventSlug/thank-you': {
+      id: '/e/$eventSlug/thank-you'
+      path: '/e/$eventSlug/thank-you'
+      fullPath: '/e/$eventSlug/thank-you'
+      preLoaderRoute: typeof EEventSlugThankYouRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/admin/pengantin/$id': {
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiQrChar123eventIdChar125DotpngRoute: ApiQrChar123eventIdChar125DotpngRoute,
   ApiUploadsPresignRoute: ApiUploadsPresignRoute,
+  EEventSlugThankYouRoute: EEventSlugThankYouRoute,
   EEventSlugIndexRoute: EEventSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
