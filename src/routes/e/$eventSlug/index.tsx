@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
 import { getEventBySlug } from '../../../server/functions/events'
 import { listFramesForEvent } from '../../../server/functions/frames'
@@ -8,14 +9,20 @@ import { FramePicker } from '../../../components/capture/FramePicker'
 
 /**
  * Fully public/unauthenticated route — guests never log in, so this route
- * lives outside the `/_authed` layout and its loader touches only
- * `getEventBySlug`/`listFramesForEvent`/`getPresignedGetUrl`. No guard or
- * header access (and therefore no `getRequestHeaders()` /
- * `@tanstack/react-start/server` import) belongs here.
+ * lives outside the `/_authed` layout and needs no guard or header access.
+ * The loader logic still touches `db` (via `getEventBySlug`/
+ * `listFramesForEvent`) and R2 credentials (via `getPresignedGetUrl`)
+ * though, and this route file has both `loader` and `component`, so it's
+ * client-bundled — calling those directly from the loader (loaders run on
+ * both server and client) would pull `db/client.ts` into the client bundle,
+ * where `neon(process.env.DATABASE_URL!)` throws on import and crashes
+ * hydration app-wide. Routing it through `createServerFn` keeps the DB/R2
+ * imports server-only.
  */
-export const Route = createFileRoute('/e/$eventSlug/')({
-  loader: async ({ params }) => {
-    const event = await getEventBySlug(params.eventSlug)
+const getGuestLandingDataFn = createServerFn({ method: 'GET' })
+  .validator((eventSlug: string) => eventSlug)
+  .handler(async ({ data: eventSlug }) => {
+    const event = await getEventBySlug(eventSlug)
     if (!event || event.status !== 'active') return { event: null, frames: [] }
     const frames = await listFramesForEvent(event.id)
     // `objectKey` is overwritten with a short-lived presigned GET URL so the
@@ -25,7 +32,10 @@ export const Route = createFileRoute('/e/$eventSlug/')({
       frames.map(async (f) => ({ ...f, objectKey: await getPresignedGetUrl(f.objectKey) })),
     )
     return { event, frames: framesWithUrls }
-  },
+  })
+
+export const Route = createFileRoute('/e/$eventSlug/')({
+  loader: async ({ params }) => getGuestLandingDataFn({ data: params.eventSlug }),
   component: GuestLandingPage,
 })
 

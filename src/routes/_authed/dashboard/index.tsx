@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { listMyEvents } from '../../../server/functions/events'
+import { listMyEventsFn } from '../../../server/functions/events'
 
 export const Route = createFileRoute('/_authed/dashboard/')({
-  loader: async ({ context }) => listMyEvents(context.session.user.id),
+  loader: async () => listMyEventsFn(),
   component: DashboardHome,
 })
 

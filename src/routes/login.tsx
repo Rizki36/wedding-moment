@@ -11,6 +11,7 @@ function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setError(null)
     const { error } = await signIn.email({ email, password })
     if (error) setError(error.message ?? 'Login gagal')
     else window.location.href = '/dashboard'

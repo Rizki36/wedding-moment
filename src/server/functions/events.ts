@@ -1,9 +1,9 @@
-import { createServerFn } from '@tanstack/react-start'
+import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 import { db } from '../db/client'
 import { events } from '../db/schema'
-import { requireEventOwner, requirePengantin } from '../auth/guards'
+import { requireAdmin, requireEventOwner, requirePengantin } from '../auth/guards'
 
 export type CreateEventInput = {
   ownerId: string
@@ -31,17 +31,19 @@ function pickEditableFields(input: Record<string, unknown>): UpdateEventInput {
 }
 
 /**
- * Core DB logic — plain async functions so they can be unit-tested directly
- * (calling a `createServerFn`-wrapped function outside of the Start request
- * runtime throws "No Start context found in AsyncLocalStorage"). Route
- * loaders in this project call these directly too, since TanStack Start
- * loaders always execute server-side (see `_authed.tsx`'s `beforeLoad`
- * pattern from Task 6). Only the two mutations invoked from client-side
- * event handlers (the New Event / Settings forms) go through the
- * `createServerFn`-wrapped variants below, so the `db` import never gets
- * bundled into client JS.
+ * Core DB logic, each wrapped in `createServerOnlyFn` (see `guards.ts` and
+ * `users.ts` for the same pattern and its full rationale). They're still
+ * callable directly for unit tests and from route loaders — unlike a
+ * `createServerFn` handler, `createServerOnlyFn` only throws when actually
+ * invoked from a browser, not from Node/vitest or a server-side loader —
+ * but wrapping is what lets the compiler prune the `db` import from any
+ * client bundle that reaches these functions, rather than just deferring
+ * its use. A plain top-level `async function` doesn't get that treatment:
+ * confirmed via `pnpm build` + `grep -r DATABASE_URL dist/client` that
+ * leaving these unwrapped kept `db` alive in the client bundle even once
+ * every direct call site was routed through the `*Fn` wrappers below.
  */
-export async function createEvent(input: CreateEventInput) {
+export const createEvent = createServerOnlyFn(async (input: CreateEventInput) => {
   const slug = nanoid(10)
   const eventDate = new Date(input.eventDate)
   const retentionDeadline = new Date(eventDate.getTime() + 30 * 24 * 60 * 60 * 1000)
@@ -60,26 +62,26 @@ export async function createEvent(input: CreateEventInput) {
     .returning()
 
   return event
-}
+})
 
-export async function getEvent(eventId: string) {
+export const getEvent = createServerOnlyFn(async (eventId: string) => {
   const [event] = await db.select().from(events).where(eq(events.id, eventId))
   return event ?? null
-}
+})
 
-export async function getEventBySlug(slug: string) {
+export const getEventBySlug = createServerOnlyFn(async (slug: string) => {
   const [event] = await db.select().from(events).where(eq(events.slug, slug))
   return event ?? null
-}
+})
 
-export async function listMyEvents(ownerId: string) {
+export const listMyEvents = createServerOnlyFn(async (ownerId: string) => {
   return db.select().from(events).where(eq(events.ownerId, ownerId))
-}
+})
 
-export async function updateEvent(eventId: string, input: UpdateEventInput) {
+export const updateEvent = createServerOnlyFn(async (eventId: string, input: UpdateEventInput) => {
   const [event] = await db.update(events).set(input).where(eq(events.id, eventId)).returning()
   return event
-}
+})
 
 /**
  * Client-safe entry points. These run through TanStack Start's server
@@ -116,4 +118,39 @@ export const updateEventFn = createServerFn({ method: 'POST' })
     // Restrict to the whitelisted editable fields — never let ownerId, id,
     // slug, status, retentionDeadline, purgedAt, or timestamps through.
     return updateEvent(eventId, pickEditableFields(rest))
+  })
+
+/**
+ * Client-safe entry points for route `loader`s. Loaders run on both server
+ * and client (a loader is not a server boundary by itself — see the plain
+ * `async function`s above), so a client-bundled route file (one with both
+ * `beforeLoad`/`loader` and `component`) that calls `getEvent`/`listMyEvents`
+ * directly from its loader pulls `db/client.ts` into the client bundle,
+ * where `neon(process.env.DATABASE_URL!)` throws on import and crashes
+ * hydration app-wide. Each handler re-verifies access itself, matching the
+ * `createEventFn`/`updateEventFn` rationale above, since these become
+ * network-reachable independent of any route's `beforeLoad`.
+ */
+export const getEventFn = createServerFn({ method: 'GET' })
+  .validator((eventId: string) => eventId)
+  .handler(async ({ data: eventId }) => {
+    // `requireEventOwner` allows admins through, so this single endpoint
+    // serves both the pengantin dashboard and the admin QR page.
+    await requireEventOwner(eventId)
+    return getEvent(eventId)
+  })
+
+export const listMyEventsFn = createServerFn({ method: 'GET' }).handler(async () => {
+  // Ownership is derived from the verified session, not a client-supplied
+  // id, so a caller can only ever list their own events here.
+  const session = await requirePengantin()
+  return listMyEvents(session.user.id)
+})
+
+/** Admin-only: list events for an arbitrary pengantin (`admin/pengantin.$id.tsx`). */
+export const listEventsForOwnerFn = createServerFn({ method: 'GET' })
+  .validator((ownerId: string) => ownerId)
+  .handler(async ({ data: ownerId }) => {
+    await requireAdmin()
+    return listMyEvents(ownerId)
   })

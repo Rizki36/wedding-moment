@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { listMyEvents } from '../../../server/functions/events'
+import { listEventsForOwnerFn } from '../../../server/functions/events'
 
 export const Route = createFileRoute('/_authed/admin/pengantin/$id')({
-  loader: async ({ params }) => listMyEvents(params.id),
+  loader: async ({ params }) => listEventsForOwnerFn({ data: params.id }),
   component: PengantinDetail,
 })
 

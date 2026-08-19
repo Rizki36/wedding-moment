@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { listPengantin } from '../../../server/functions/users'
+import { listPengantinFn } from '../../../server/functions/users'
 
 export const Route = createFileRoute('/_authed/admin/')({
-  loader: async () => listPengantin(),
+  loader: async () => listPengantinFn(),
   component: AdminHome,
 })
 

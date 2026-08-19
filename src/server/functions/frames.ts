@@ -1,26 +1,27 @@
-import { createServerFn } from '@tanstack/react-start'
+import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '../db/client'
 import { frames } from '../db/schema'
 import { requireEventOwner } from '../auth/guards'
 
 /**
- * Core DB logic — plain async functions so they can be unit-tested directly
- * and called from route loaders, matching the pattern established in
- * `events.ts` (Task 7).
+ * Core DB logic, each wrapped in `createServerOnlyFn` — see `events.ts` for
+ * the full rationale (a plain top-level `async function` doesn't get its
+ * `db` import pruned from the client bundle, even once every direct call
+ * site is routed through the `*Fn` wrappers below).
  */
-export async function createFrame(eventId: string, name: string, objectKey: string) {
+export const createFrame = createServerOnlyFn(async (eventId: string, name: string, objectKey: string) => {
   const [frame] = await db.insert(frames).values({ eventId, name, objectKey }).returning()
   return frame
-}
+})
 
-export async function listFramesForEvent(eventId: string) {
+export const listFramesForEvent = createServerOnlyFn(async (eventId: string) => {
   return db.select().from(frames).where(eq(frames.eventId, eventId))
-}
+})
 
-export async function deleteFrame(frameId: string) {
+export const deleteFrame = createServerOnlyFn(async (frameId: string) => {
   await db.delete(frames).where(eq(frames.id, frameId))
-}
+})
 
 /**
  * Client-safe entry points. These run through TanStack Start's server
@@ -32,6 +33,22 @@ export async function deleteFrame(frameId: string) {
  * rendering the page, so each handler re-verifies ownership itself rather
  * than trusting the page's `beforeLoad` guard.
  */
+/**
+ * Client-safe entry point for `events.$eventId/frames.tsx`'s route
+ * `loader`. Loaders run on both server and client, so calling
+ * `listFramesForEvent` (which touches `db`) directly from a loader in that
+ * client-bundled route file pulls `db/client.ts` into the client bundle,
+ * where `neon(process.env.DATABASE_URL!)` throws on import and crashes
+ * hydration app-wide — see `events.ts`'s `getEventFn` for the same
+ * rationale.
+ */
+export const listFramesForEventFn = createServerFn({ method: 'GET' })
+  .validator((eventId: string) => eventId)
+  .handler(async ({ data: eventId }) => {
+    await requireEventOwner(eventId)
+    return listFramesForEvent(eventId)
+  })
+
 export const createFrameFn = createServerFn({ method: 'POST' })
   .validator((input: { eventId: string; name: string; objectKey: string }) => input)
   .handler(async ({ data }) => {

@@ -41,29 +41,47 @@ const getAmbientHeaders = createServerOnlyFn(() => getRequestHeaders())
  * `getAmbientHeaders()`/`getRequestHeaders()` requires and vitest does not
  * provide (confirmed: calling `getRequestHeaders()` outside a real Start
  * request throws "No StartEvent found in AsyncLocalStorage").
+ *
+ * Each guard below is itself wrapped in `createServerOnlyFn`. `auth` (from
+ * `./auth`) and `db` (from `../db/client`) are regular local modules, not
+ * one of TanStack Start's recognized server-only packages, so the compiler
+ * won't flag them — but `auth.ts` eagerly builds a Better Auth instance via
+ * `drizzleAdapter(db, ...)` at module scope, and `db/client.ts` eagerly
+ * calls `neon(process.env.DATABASE_URL!)` at module scope. If either import
+ * stays reachable from client-bundled route files (e.g. `_authed.tsx`,
+ * `dashboard.tsx`, `admin.tsx`, the `events.$eventId/*` routes — all of
+ * which have both `beforeLoad` and `component`), that module-scope code
+ * runs in the browser, where `process.env.DATABASE_URL` is undefined, and
+ * `neon()` throws immediately on import — crashing hydration for the whole
+ * app, not just the guard call. Per the import-protection guide, wrapping a
+ * helper in `createServerOnlyFn` removes it "from client builds along with
+ * its associated server-only imports" — so keeping `auth`/`db` usage
+ * exclusively inside these wrapped closures (rather than in top-level
+ * `async function`s) lets the compiler prune both imports, and everything
+ * they pull in, from the client bundle instead of just deferring them.
  */
-export async function getSessionOrRedirect(headers?: Headers) {
+export const getSessionOrRedirect = createServerOnlyFn(async (headers?: Headers) => {
   const session = await auth.api.getSession({ headers: headers ?? getAmbientHeaders() })
   if (!session) throw redirect({ to: '/login' })
   return session
-}
+})
 
-export async function requireAdmin(headers?: Headers) {
+export const requireAdmin = createServerOnlyFn(async (headers?: Headers) => {
   const session = await getSessionOrRedirect(headers)
   if (session.user.role !== 'admin') throw redirect({ to: '/dashboard' })
   return session
-}
+})
 
-export async function requirePengantin(headers?: Headers) {
+export const requirePengantin = createServerOnlyFn(async (headers?: Headers) => {
   const session = await getSessionOrRedirect(headers)
   if (session.user.role !== 'pengantin' && session.user.role !== 'admin') throw redirect({ to: '/login' })
   return session
-}
+})
 
-export async function requireEventOwner(eventId: string, headers?: Headers) {
+export const requireEventOwner = createServerOnlyFn(async (eventId: string, headers?: Headers) => {
   const session = await requirePengantin(headers)
   if (session.user.role === 'admin') return session
   const [event] = await db.select().from(events).where(eq(events.id, eventId))
   if (!event || event.ownerId !== session.user.id) throw redirect({ to: '/dashboard' })
   return session
-}
+})

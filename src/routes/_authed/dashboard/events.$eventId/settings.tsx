@@ -1,13 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { requireEventOwner } from '../../../../server/auth/guards'
-import { getEvent, updateEventFn } from '../../../../server/functions/events'
+import { getEventFn, updateEventFn } from '../../../../server/functions/events'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/settings')({
   beforeLoad: async ({ params }) => {
     await requireEventOwner(params.eventId)
   },
-  loader: async ({ params }) => getEvent(params.eventId),
+  loader: async ({ params }) => getEventFn({ data: params.eventId }),
   component: EventSettings,
 })
 
