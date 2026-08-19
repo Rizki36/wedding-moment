@@ -1,8 +1,10 @@
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '../db/client'
 import { events, submissions } from '../db/schema'
 import { createSubmissionSchema } from '../../lib/validators'
+import { requireEventOwner } from '../auth/guards'
+import { getPresignedGetUrl } from '../storage/presign'
 
 /**
  * Core DB logic, wrapped in `createServerOnlyFn` — see `events.ts`/
@@ -28,6 +30,48 @@ export const createSubmission = createServerOnlyFn(async (input: unknown) => {
   const [submission] = await db.insert(submissions).values(parsed).returning()
   return submission
 })
+
+/**
+ * Lists all submissions for an event, newest first. Ownership is NOT
+ * re-checked here — unlike `createSubmission` (unauthenticated by design),
+ * this is only ever called from an already-guarded context (a route
+ * `beforeLoad`, or `listSubmissionsForEventFn` below, both of which run
+ * `requireEventOwner` first), matching how `getEvent`/`listFramesForEvent`
+ * defer authorization to their callers rather than duplicating it.
+ */
+export const listSubmissionsForEvent = createServerOnlyFn(async (eventId: string) => {
+  return db.select().from(submissions).where(eq(submissions.eventId, eventId)).orderBy(desc(submissions.createdAt))
+})
+
+/**
+ * Client-safe entry point for `events.$eventId/submissions.tsx`'s route
+ * `loader`. Loaders run on both server and client, so calling
+ * `listSubmissionsForEvent` (which touches `db`) directly from a loader in
+ * that client-bundled route file pulls `db/client.ts` into the client
+ * bundle, where `neon(process.env.DATABASE_URL!)` throws on import and
+ * crashes hydration app-wide — see `events.ts`'s `getEventFn` for the same
+ * rationale. This is also a network-reachable RPC endpoint independent of
+ * any route's `beforeLoad`, so it re-verifies ownership itself rather than
+ * trusting the page's guard. It also resolves each submission's R2 object
+ * keys into short-lived presigned GET URLs here, server-side, matching how
+ * `getGuestLandingDataFn` (`src/routes/e/$eventSlug/index.tsx`) resolves
+ * frame thumbnail URLs — the R2 bucket is private, so a bare object key
+ * cannot be used as an `<img>`/`<audio>` `src` on the client.
+ */
+export const listSubmissionsForEventFn = createServerFn({ method: 'GET' })
+  .validator((eventId: string) => eventId)
+  .handler(async ({ data: eventId }) => {
+    await requireEventOwner(eventId)
+    const rows = await listSubmissionsForEvent(eventId)
+    return Promise.all(
+      rows.map(async (s) => ({
+        id: s.id,
+        guestName: s.guestName,
+        photoUrl: await getPresignedGetUrl(s.photoObjectKey),
+        audioUrl: await getPresignedGetUrl(s.audioObjectKey),
+      })),
+    )
+  })
 
 /**
  * Client-safe entry point. This is a network-reachable RPC endpoint,

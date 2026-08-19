@@ -29,6 +29,7 @@ import { Route as AuthedAdminEventsEventIdQrRouteImport } from './routes/_authed
 import { Route as AuthedDashboardEventsEventIdIndexRouteImport } from './routes/_authed/dashboard/events.$eventId/index'
 import { Route as AuthedDashboardEventsEventIdFramesRouteImport } from './routes/_authed/dashboard/events.$eventId/frames'
 import { Route as AuthedDashboardEventsEventIdSettingsRouteImport } from './routes/_authed/dashboard/events.$eventId/settings'
+import { Route as AuthedDashboardEventsEventIdSubmissionsRouteImport } from './routes/_authed/dashboard/events.$eventId/submissions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -135,6 +136,12 @@ const AuthedDashboardEventsEventIdSettingsRoute =
     path: '/events/$eventId/settings',
     getParentRoute: () => AuthedDashboardRoute,
   } as any)
+const AuthedDashboardEventsEventIdSubmissionsRoute =
+  AuthedDashboardEventsEventIdSubmissionsRouteImport.update({
+    id: '/events/$eventId/submissions',
+    path: '/events/$eventId/submissions',
+    getParentRoute: () => AuthedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
   '/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
   '/dashboard/events/$eventId': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
@@ -197,6 +206,7 @@ export interface FileRoutesById {
   '/_authed/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/_authed/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/_authed/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
+  '/_authed/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
   '/_authed/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin/events/$eventId/qr'
     | '/dashboard/events/$eventId/frames'
     | '/dashboard/events/$eventId/settings'
+    | '/dashboard/events/$eventId/submissions'
     | '/dashboard/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/admin/events/$eventId/qr'
     | '/dashboard/events/$eventId/frames'
     | '/dashboard/events/$eventId/settings'
+    | '/dashboard/events/$eventId/submissions'
     | '/dashboard/events/$eventId'
   id:
     | '__root__'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authed/admin/events/$eventId/qr'
     | '/_authed/dashboard/events/$eventId/frames'
     | '/_authed/dashboard/events/$eventId/settings'
+    | '/_authed/dashboard/events/$eventId/submissions'
     | '/_authed/dashboard/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardEventsEventIdSettingsRouteImport
       parentRoute: typeof AuthedDashboardRoute
     }
+    '/_authed/dashboard/events/$eventId/submissions': {
+      id: '/_authed/dashboard/events/$eventId/submissions'
+      path: '/events/$eventId/submissions'
+      fullPath: '/dashboard/events/$eventId/submissions'
+      preLoaderRoute: typeof AuthedDashboardEventsEventIdSubmissionsRouteImport
+      parentRoute: typeof AuthedDashboardRoute
+    }
   }
 }
 
@@ -444,6 +464,7 @@ interface AuthedDashboardRouteChildren {
   AuthedDashboardEventsNewRoute: typeof AuthedDashboardEventsNewRoute
   AuthedDashboardEventsEventIdFramesRoute: typeof AuthedDashboardEventsEventIdFramesRoute
   AuthedDashboardEventsEventIdSettingsRoute: typeof AuthedDashboardEventsEventIdSettingsRoute
+  AuthedDashboardEventsEventIdSubmissionsRoute: typeof AuthedDashboardEventsEventIdSubmissionsRoute
   AuthedDashboardEventsEventIdIndexRoute: typeof AuthedDashboardEventsEventIdIndexRoute
 }
 
@@ -454,6 +475,8 @@ const AuthedDashboardRouteChildren: AuthedDashboardRouteChildren = {
     AuthedDashboardEventsEventIdFramesRoute,
   AuthedDashboardEventsEventIdSettingsRoute:
     AuthedDashboardEventsEventIdSettingsRoute,
+  AuthedDashboardEventsEventIdSubmissionsRoute:
+    AuthedDashboardEventsEventIdSubmissionsRoute,
   AuthedDashboardEventsEventIdIndexRoute:
     AuthedDashboardEventsEventIdIndexRoute,
 }

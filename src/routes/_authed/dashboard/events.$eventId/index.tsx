@@ -28,8 +28,14 @@ function EventOverview() {
       >
         Kelola Bingkai
       </Link>
+      <Link
+        to="/dashboard/events/$eventId/submissions"
+        params={{ eventId: event?.id ?? '' }}
+        className="inline-block mt-4 ml-2 rounded-full border border-(--color-fg) px-4 py-2"
+      >
+        Lihat Ucapan Tamu
+      </Link>
       {event && <QrCodeCard eventId={event.id} slug={event.slug} />}
-      {/* submissions link (Task 16) added in a later task */}
     </div>
   )
 }
