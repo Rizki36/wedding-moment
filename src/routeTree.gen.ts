@@ -20,6 +20,7 @@ import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashb
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 import { Route as ApiQrChar123eventIdChar125DotpngRouteImport } from './routes/api/qr.{$eventId}[.]png'
 import { Route as ApiUploadsPresignRouteImport } from './routes/api/uploads.presign'
+import { Route as EEventSlugIndexRouteImport } from './routes/e/$eventSlug/index'
 import { Route as AuthedAdminPengantinIdRouteImport } from './routes/_authed/admin/pengantin.$id'
 import { Route as AuthedAdminPengantinNewRouteImport } from './routes/_authed/admin/pengantin.new'
 import { Route as AuthedDashboardEventsNewRouteImport } from './routes/_authed/dashboard/events.new'
@@ -83,6 +84,11 @@ const ApiUploadsPresignRoute = ApiUploadsPresignRouteImport.update({
   path: '/api/uploads/presign',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EEventSlugIndexRoute = EEventSlugIndexRouteImport.update({
+  id: '/e/$eventSlug/',
+  path: '/e/$eventSlug/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedAdminPengantinIdRoute = AuthedAdminPengantinIdRouteImport.update({
   id: '/pengantin/$id',
   path: '/pengantin/$id',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/admin/': typeof AuthedAdminIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/e/$eventSlug/': typeof EEventSlugIndexRoute
   '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
   '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/admin': typeof AuthedAdminIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
+  '/e/$eventSlug': typeof EEventSlugIndexRoute
   '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
   '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/e/$eventSlug/': typeof EEventSlugIndexRoute
   '/_authed/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
   '/_authed/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/_authed/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/api/uploads/presign'
     | '/admin/'
     | '/dashboard/'
+    | '/e/$eventSlug/'
     | '/admin/pengantin/$id'
     | '/admin/pengantin/new'
     | '/dashboard/events/new'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/api/uploads/presign'
     | '/admin'
     | '/dashboard'
+    | '/e/$eventSlug'
     | '/admin/pengantin/$id'
     | '/admin/pengantin/new'
     | '/dashboard/events/new'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/api/uploads/presign'
     | '/_authed/admin/'
     | '/_authed/dashboard/'
+    | '/e/$eventSlug/'
     | '/_authed/admin/pengantin/$id'
     | '/_authed/admin/pengantin/new'
     | '/_authed/dashboard/events/new'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiQrChar123eventIdChar125DotpngRoute: typeof ApiQrChar123eventIdChar125DotpngRoute
   ApiUploadsPresignRoute: typeof ApiUploadsPresignRoute
+  EEventSlugIndexRoute: typeof EEventSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -327,6 +340,13 @@ declare module '@tanstack/react-router' {
       path: '/api/uploads/presign'
       fullPath: '/api/uploads/presign'
       preLoaderRoute: typeof ApiUploadsPresignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/e/$eventSlug/': {
+      id: '/e/$eventSlug/'
+      path: '/e/$eventSlug'
+      fullPath: '/e/$eventSlug/'
+      preLoaderRoute: typeof EEventSlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/admin/pengantin/$id': {
@@ -443,6 +463,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiQrChar123eventIdChar125DotpngRoute: ApiQrChar123eventIdChar125DotpngRoute,
   ApiUploadsPresignRoute: ApiUploadsPresignRoute,
+  EEventSlugIndexRoute: EEventSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,42 @@
+import { RadioGroup, Radio } from '@headlessui/react'
+
+type Frame = { id: string; name: string | null; objectKey: string }
+
+export function FramePicker({
+  frames,
+  value,
+  onChange,
+  onSkip,
+}: {
+  frames: Frame[]
+  value: string | null
+  onChange: (frameId: string | null) => void
+  onSkip: () => void
+}) {
+  if (frames.length === 0) {
+    onSkip()
+    return null
+  }
+
+  return (
+    <div className="p-6">
+      <h2 className="font-(--font-display) text-xl text-(--color-fg) mb-4">Pilih Bingkai (opsional)</h2>
+      <RadioGroup value={value} onChange={onChange} className="grid grid-cols-3 gap-3">
+        {frames.map((frame) => (
+          <Radio
+            key={frame.id}
+            value={frame.id}
+            className="border rounded-xl p-2 cursor-pointer data-checked:border-(--color-fg)"
+          >
+            {/* `objectKey` here is a presigned GET URL resolved by the route
+                loader, not a raw R2 object key — see index.tsx. */}
+            <img src={frame.objectKey} alt={frame.name ?? ''} />
+          </Radio>
+        ))}
+      </RadioGroup>
+      <button onClick={onSkip} className="mt-4 rounded-full border border-(--color-fg) px-4 py-2">
+        Tanpa Bingkai
+      </button>
+    </div>
+  )
+}
