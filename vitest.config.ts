@@ -5,5 +5,11 @@ export default defineConfig({
   plugins: [viteReact()],
   test: {
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
+    setupFiles: ['./tests/setup-canvas.ts'],
   },
 })
