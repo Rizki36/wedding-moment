@@ -19,3 +19,20 @@ export const r2Client = new AwsClient({
 export const R2_ENDPOINT = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
 
 export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!
+
+/**
+ * Streams an object directly from R2 via a signed GET request, server-side.
+ * Unlike `getPresignedGetUrl` (which hands the *client* a URL to fetch
+ * from directly), this performs the signed request itself and returns the
+ * raw `Response` — whose `.body` is a `ReadableStream` — so callers (e.g.
+ * the bulk ZIP download route) can pipe object bytes straight into another
+ * stream (a ZIP writer) without buffering the whole object in memory.
+ *
+ * `r2Client.fetch` (as opposed to `.sign`, used by `presign.ts`) signs AND
+ * performs the HTTP request in one call. Same authorization caveat as the
+ * `getPresigned*Url` helpers: this does NOT perform authorization — callers
+ * must verify the caller is allowed to read `key` before calling this.
+ */
+export async function getR2Object(key: string): Promise<Response> {
+  return r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`, { method: 'GET' })
+}

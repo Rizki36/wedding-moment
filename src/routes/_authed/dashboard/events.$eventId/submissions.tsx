@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { listSubmissionsForEventFn } from '../../../../server/functions/submissions'
 import { SubmissionGrid } from '../../../../components/dashboard/SubmissionGrid'
+import { BulkDownloadButton } from '../../../../components/dashboard/BulkDownloadButton'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/submissions')({
   beforeLoad: async ({ params }) => {
@@ -13,10 +14,14 @@ export const Route = createFileRoute('/_authed/dashboard/events/$eventId/submiss
 
 function SubmissionsPage() {
   const submissionList = Route.useLoaderData()
+  const { eventId } = Route.useParams()
 
   return (
     <div className="p-8">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg) mb-6">Ucapan Tamu</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-(--font-display) text-2xl text-(--color-fg)">Ucapan Tamu</h1>
+        <BulkDownloadButton eventId={eventId} />
+      </div>
       <SubmissionGrid submissions={submissionList} />
     </div>
   )

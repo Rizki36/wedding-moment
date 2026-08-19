@@ -18,6 +18,7 @@ import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiDownloadChar123eventIdChar125DotzipRouteImport } from './routes/api/download.{$eventId}[.]zip'
 import { Route as ApiQrChar123eventIdChar125DotpngRouteImport } from './routes/api/qr.{$eventId}[.]png'
 import { Route as ApiUploadsPresignRouteImport } from './routes/api/uploads.presign'
 import { Route as EEventSlugIndexRouteImport } from './routes/e/$eventSlug/index'
@@ -75,6 +76,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDownloadChar123eventIdChar125DotzipRoute =
+  ApiDownloadChar123eventIdChar125DotzipRouteImport.update({
+    id: '/api/download/{$eventId}.zip',
+    path: '/api/download/{$eventId}.zip',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiQrChar123eventIdChar125DotpngRoute =
   ApiQrChar123eventIdChar125DotpngRouteImport.update({
     id: '/api/qr/{$eventId}.png',
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
@@ -194,6 +203,7 @@ export interface FileRoutesById {
   '/_authed/admin': typeof AuthedAdminRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
   '/e/$eventSlug/thank-you': typeof EEventSlugThankYouRoute
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/api/auth/$'
+    | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
     | '/e/$eventSlug/thank-you'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/api/auth/$'
+    | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
     | '/e/$eventSlug/thank-you'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authed/admin'
     | '/_authed/dashboard'
     | '/api/auth/$'
+    | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
     | '/e/$eventSlug/thank-you'
@@ -283,6 +296,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiDownloadChar123eventIdChar125DotzipRoute: typeof ApiDownloadChar123eventIdChar125DotzipRoute
   ApiQrChar123eventIdChar125DotpngRoute: typeof ApiQrChar123eventIdChar125DotpngRoute
   ApiUploadsPresignRoute: typeof ApiUploadsPresignRoute
   EEventSlugThankYouRoute: typeof EEventSlugThankYouRoute
@@ -352,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/download/{$eventId}.zip': {
+      id: '/api/download/{$eventId}.zip'
+      path: '/api/download/{$eventId}.zip'
+      fullPath: '/api/download/{$eventId}.zip'
+      preLoaderRoute: typeof ApiDownloadChar123eventIdChar125DotzipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/qr/{$eventId}.png': {
@@ -504,6 +525,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiDownloadChar123eventIdChar125DotzipRoute:
+    ApiDownloadChar123eventIdChar125DotzipRoute,
   ApiQrChar123eventIdChar125DotpngRoute: ApiQrChar123eventIdChar125DotpngRoute,
   ApiUploadsPresignRoute: ApiUploadsPresignRoute,
   EEventSlugThankYouRoute: EEventSlugThankYouRoute,
