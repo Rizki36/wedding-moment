@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { requireEventOwner } from '../../../../server/auth/guards'
 import { getEvent } from '../../../../server/functions/events'
+import { QrCodeCard } from '../../../../components/dashboard/QrCodeCard'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/')({
   beforeLoad: async ({ params }) => {
@@ -27,7 +28,8 @@ function EventOverview() {
       >
         Kelola Bingkai
       </Link>
-      {/* QrCodeCard (Task 10), submissions link (Task 16) added in later tasks */}
+      {event && <QrCodeCard eventId={event.id} slug={event.slug} />}
+      {/* submissions link (Task 16) added in a later task */}
     </div>
   )
 }
