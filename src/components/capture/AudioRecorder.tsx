@@ -15,6 +15,14 @@ export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeTyp
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
+      const recorder = recorderRef.current
+      if (recorder && recorder.state !== 'inactive') {
+        // Detach handlers so onRecorded/setAudioUrl don't fire after unmount.
+        recorder.onstop = null
+        recorder.ondataavailable = null
+        recorder.stop()
+        recorder.stream.getTracks().forEach((t) => t.stop())
+      }
     }
   }, [])
 
@@ -65,7 +73,10 @@ export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeTyp
   }
 
   function reRecord() {
-    setAudioUrl(null)
+    setAudioUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return null
+    })
     setSecondsLeft(MAX_AUDIO_SECONDS)
   }
 
