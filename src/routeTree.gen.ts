@@ -18,6 +18,7 @@ import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiCronPurgeRouteImport } from './routes/api/cron.purge'
 import { Route as ApiDownloadChar123eventIdChar125DotzipRouteImport } from './routes/api/download.{$eventId}[.]zip'
 import { Route as ApiQrChar123eventIdChar125DotpngRouteImport } from './routes/api/qr.{$eventId}[.]png'
 import { Route as ApiUploadsPresignRouteImport } from './routes/api/uploads.presign'
@@ -74,6 +75,11 @@ const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronPurgeRoute = ApiCronPurgeRouteImport.update({
+  id: '/api/cron/purge',
+  path: '/api/cron/purge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDownloadChar123eventIdChar125DotzipRoute =
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteWithChildren
   '/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/purge': typeof ApiCronPurgeRoute
   '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/purge': typeof ApiCronPurgeRoute
   '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_authed/admin': typeof AuthedAdminRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/purge': typeof ApiCronPurgeRoute
   '/api/download/{$eventId}.zip': typeof ApiDownloadChar123eventIdChar125DotzipRoute
   '/api/qr/{$eventId}.png': typeof ApiQrChar123eventIdChar125DotpngRoute
   '/api/uploads/presign': typeof ApiUploadsPresignRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/api/auth/$'
+    | '/api/cron/purge'
     | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/api/auth/$'
+    | '/api/cron/purge'
     | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authed/admin'
     | '/_authed/dashboard'
     | '/api/auth/$'
+    | '/api/cron/purge'
     | '/api/download/{$eventId}.zip'
     | '/api/qr/{$eventId}.png'
     | '/api/uploads/presign'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCronPurgeRoute: typeof ApiCronPurgeRoute
   ApiDownloadChar123eventIdChar125DotzipRoute: typeof ApiDownloadChar123eventIdChar125DotzipRoute
   ApiQrChar123eventIdChar125DotpngRoute: typeof ApiQrChar123eventIdChar125DotpngRoute
   ApiUploadsPresignRoute: typeof ApiUploadsPresignRoute
@@ -366,6 +379,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/purge': {
+      id: '/api/cron/purge'
+      path: '/api/cron/purge'
+      fullPath: '/api/cron/purge'
+      preLoaderRoute: typeof ApiCronPurgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/download/{$eventId}.zip': {
@@ -525,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCronPurgeRoute: ApiCronPurgeRoute,
   ApiDownloadChar123eventIdChar125DotzipRoute:
     ApiDownloadChar123eventIdChar125DotzipRoute,
   ApiQrChar123eventIdChar125DotpngRoute: ApiQrChar123eventIdChar125DotpngRoute,

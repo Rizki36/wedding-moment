@@ -3,5 +3,17 @@
   "name": "wedding-moment",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "@tanstack/react-start/server-entry",
+  // Declares intent to run the retention-purge job daily at 02:00 UTC. No
+  // native Cloudflare Worker `scheduled` handler is wired up yet to act on
+  // this trigger — see Task 19's report for why (the installed
+  // @tanstack/react-start's `createServerEntry` helper strips any export
+  // key besides `fetch`, and swapping `main` to a hand-rolled entry point
+  // to add a `scheduled` export was ruled out of scope as too risky for
+  // this task). Until that follow-up lands, POST /api/cron/purge must be
+  // invoked by an external scheduler (e.g. a GitHub Actions cron workflow)
+  // with the `x-cron-secret` header set to the deployed CRON_SECRET.
+  "triggers": {
+    "crons": ["0 2 * * *"]
+  }
 }
