@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { requireEventOwner } from '../../../../server/auth/guards'
+import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { getEventFn } from '../../../../server/functions/events'
 import { QrCodeCard } from '../../../../components/dashboard/QrCodeCard'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/')({
   beforeLoad: async ({ params }) => {
-    await requireEventOwner(params.eventId)
+    await requireEventOwnerFn({ data: params.eventId })
   },
   loader: async ({ params }) => getEventFn({ data: params.eventId }),
   component: EventOverview,

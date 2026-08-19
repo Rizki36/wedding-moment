@@ -1,4 +1,4 @@
-import { createServerOnlyFn } from '@tanstack/react-start'
+import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 import { redirect } from '@tanstack/react-router'
 import { eq } from 'drizzle-orm'
@@ -85,3 +85,26 @@ export const requireEventOwner = createServerOnlyFn(async (eventId: string, head
   if (!event || event.ownerId !== session.user.id) throw redirect({ to: '/dashboard' })
   return session
 })
+
+/**
+ * `createServerFn`-wrapped RPCs for the guards above, for use from route
+ * `beforeLoad`s. `beforeLoad` runs client-side too (on client navigation and
+ * on `intent` preload — see `router.tsx`'s `defaultPreload: 'intent'`), so
+ * calling a `createServerOnlyFn` guard directly from `beforeLoad` throws
+ * "createServerOnlyFn() functions can only be called on the server!" the
+ * moment the browser re-runs it. Routing through `createServerFn` (same
+ * pattern as the `*Fn` loader RPCs in `events.ts`/`frames.ts`) makes the call
+ * a real network round-trip, so it's safe from any context. `redirect()`
+ * thrown inside a `createServerFn` handler is serialized and re-thrown
+ * client-side by the RPC layer, preserving the existing redirect-on-failure
+ * behavior.
+ */
+export const getSessionOrRedirectFn = createServerFn({ method: 'GET' }).handler(() => getSessionOrRedirect())
+
+export const requireAdminFn = createServerFn({ method: 'GET' }).handler(() => requireAdmin())
+
+export const requirePengantinFn = createServerFn({ method: 'GET' }).handler(() => requirePengantin())
+
+export const requireEventOwnerFn = createServerFn({ method: 'GET' })
+  .validator((eventId: string) => eventId)
+  .handler(({ data: eventId }) => requireEventOwner(eventId))

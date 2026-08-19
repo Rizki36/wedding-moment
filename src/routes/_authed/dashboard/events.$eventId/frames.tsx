@@ -1,11 +1,11 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { requireEventOwner } from '../../../../server/auth/guards'
+import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { listFramesForEventFn, deleteFrameFn } from '../../../../server/functions/frames'
 import { FrameUploadForm } from '../../../../components/dashboard/FrameUploadForm'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/frames')({
   beforeLoad: async ({ params }) => {
-    await requireEventOwner(params.eventId)
+    await requireEventOwnerFn({ data: params.eventId })
   },
   loader: async ({ params }) => listFramesForEventFn({ data: params.eventId }),
   component: FramesPage,
