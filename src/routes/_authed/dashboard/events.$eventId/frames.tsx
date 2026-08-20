@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { requireEventOwnerFn } from '../../../../server/auth/guards'
 import { listFramesForEventFn, deleteFrameFn } from '../../../../server/functions/frames'
 import { FrameUploadForm } from '../../../../components/dashboard/FrameUploadForm'
+import { cardClasses } from '../../../../components/ui/Card'
 
 export const Route = createFileRoute('/_authed/dashboard/events/$eventId/frames')({
   beforeLoad: async ({ params }) => {
@@ -24,7 +25,7 @@ function FramesPage() {
         {frameList.map((frame) => (
           <li
             key={frame.id}
-            className="bg-(--color-surface-container-lowest) rounded-lg shadow-[0_4px_20px_rgba(45,71,57,0.04)] p-2"
+            className={`${cardClasses} p-2`}
           >
             <p className="text-sm text-(--color-on-surface)">{frame.name}</p>
             <button

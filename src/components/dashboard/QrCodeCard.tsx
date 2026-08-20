@@ -1,4 +1,5 @@
 import { Card } from '../ui/Card'
+import { primaryButtonVariantClasses } from '../ui/Button'
 
 export function QrCodeCard({ eventId, slug }: { eventId: string; slug: string }) {
   const eventUrl = typeof window !== 'undefined' ? `${window.location.origin}/e/${slug}` : `/e/${slug}`
@@ -9,7 +10,7 @@ export function QrCodeCard({ eventId, slug }: { eventId: string; slug: string })
       {/* Plain `<a>`, not `LinkButton` — points at an API-served file, not a router route. */}
       <a
         href={`/api/qr/${eventId}.png?download=1`}
-        className="rounded bg-(--color-primary) text-(--color-on-primary) px-4 py-2 text-sm font-medium transition hover:opacity-90"
+        className={`rounded ${primaryButtonVariantClasses} px-4 py-2 text-sm font-medium transition`}
       >
         Unduh QR Code
       </a>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { listMyEventsFn } from '../../../server/functions/events'
 import { LinkButton } from '#/components/ui/Button'
+import { cardClasses } from '#/components/ui/Card'
 
 export const Route = createFileRoute('/_authed/dashboard/')({
   loader: async () => listMyEventsFn(),
@@ -21,7 +22,7 @@ function DashboardHome() {
             <Link
               to="/dashboard/events/$eventId"
               params={{ eventId: event.id }}
-              className="block bg-(--color-surface-container-lowest) rounded-lg shadow-[0_4px_20px_rgba(45,71,57,0.04)] p-4 text-(--color-on-surface)"
+              className={`block ${cardClasses} p-4 text-(--color-on-surface)`}
             >
               {event.brideName} &amp; {event.groomName} — {event.eventDate}
             </Link>
