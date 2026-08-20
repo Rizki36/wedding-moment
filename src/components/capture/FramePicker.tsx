@@ -27,13 +27,13 @@ export function FramePicker({
 
   return (
     <div className="p-6">
-      <h2 className="font-(--font-display) text-xl text-(--color-fg) mb-4">Pilih Bingkai (opsional)</h2>
+      <h2 className="font-(--font-display) text-xl text-(--color-on-surface) mb-4">Pilih Bingkai (opsional)</h2>
       <RadioGroup value={value} onChange={onChange} className="grid grid-cols-3 gap-3">
         {frames.map((frame) => (
           <Radio
             key={frame.id}
             value={frame.id}
-            className="border rounded-xl p-2 cursor-pointer data-checked:border-(--color-fg)"
+            className="border border-(--color-outline-variant) rounded p-2 cursor-pointer data-checked:border-(--color-primary)"
           >
             {/* `objectKey` here is a presigned GET URL resolved by the route
                 loader, not a raw R2 object key — see index.tsx. */}
