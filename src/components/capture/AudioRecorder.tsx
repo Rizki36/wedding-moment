@@ -98,7 +98,7 @@ export function AudioRecorder({ onRecorded }: { onRecorded: (blob: Blob, mimeTyp
     <div className="flex flex-col items-center gap-3 p-4">
       {recording ? (
         <>
-          <p className="text-(--color-fg)">Merekam... {secondsLeft}s</p>
+          <p className="text-(--color-on-surface)">Merekam... {secondsLeft}s</p>
           <Button type="button" onClick={stopRecording} className="!bg-red-600">
             Berhenti
           </Button>
