@@ -5,6 +5,9 @@ import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/_authed/admin/pengantin/new')({ component: NewPengantinPage })
 
+const inputClass =
+  'border-b-2 border-(--color-outline-variant) bg-(--color-surface-container-low) rounded px-3 py-2 text-(--color-on-surface) focus:border-(--color-primary) focus:outline-none transition-colors'
+
 function NewPengantinPage() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
@@ -25,13 +28,13 @@ function NewPengantinPage() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-12 flex flex-col gap-4">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg)">Buat Akun Pengantin</h1>
+      <h1 className="font-(--font-display) text-2xl text-(--color-on-surface)">Buat Akun Pengantin</h1>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Nama"
         required
-        className="border rounded px-3 py-2"
+        className={inputClass}
       />
       <input
         value={email}
@@ -39,7 +42,7 @@ function NewPengantinPage() {
         type="email"
         placeholder="Email"
         required
-        className="border rounded px-3 py-2"
+        className={inputClass}
       />
       <input
         value={password}
@@ -47,9 +50,9 @@ function NewPengantinPage() {
         type="password"
         placeholder="Kata sandi sementara"
         required
-        className="border rounded px-3 py-2"
+        className={inputClass}
       />
-      <p className="text-sm text-(--color-fg-muted)">
+      <p className="text-sm text-(--color-on-surface-variant)">
         Beri tahu kredensial ini secara manual kepada pengantin (chat/telepon).
       </p>
       {error && <p className="text-red-600 text-sm">{error}</p>}

@@ -19,7 +19,7 @@ function AdminQrPage() {
   if (!event) return null
   return (
     <div className="p-8">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg) mb-4">
+      <h1 className="font-(--font-display) text-2xl text-(--color-on-surface) mb-4">
         Cetak QR untuk {event.brideName} &amp; {event.groomName}
       </h1>
       <QrCodeCard eventId={event.id} slug={event.slug} />
