@@ -56,8 +56,8 @@ function GuestLandingPage() {
 
   if (!event) {
     return (
-      <div className="bg-(--color-bg) min-h-screen flex items-center justify-center p-8 text-center">
-        <p className="text-(--color-fg)">Acara ini tidak lagi tersedia.</p>
+      <div className="bg-(--color-surface) min-h-screen flex items-center justify-center p-8 text-center">
+        <p className="text-(--color-on-surface)">Acara ini tidak lagi tersedia.</p>
       </div>
     )
   }
@@ -238,7 +238,7 @@ function CaptureStep({
         onDownloadPhoto={handleDownloadPhoto}
         onSubmit={handleSubmit}
       />
-      {submitting && <p className="text-center text-(--color-fg-muted)">Mengirim...</p>}
+      {submitting && <p className="text-center text-(--color-on-surface-variant)">Mengirim...</p>}
       {error && <p className="text-center text-red-600">{error}</p>}
     </div>
   )
