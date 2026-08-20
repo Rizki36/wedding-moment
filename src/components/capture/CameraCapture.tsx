@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { resizeAndCompress } from '#/lib/image'
 import { Button } from '#/components/ui/Button'
 
-export function CameraCapture({ onCapture }: { onCapture: (blob: Blob) => void }) {
+export function CameraCapture({
+  onCapture,
+  frameUrl,
+}: {
+  onCapture: (blob: Blob) => void
+  frameUrl?: string | null
+}) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [error, setError] = useState<string | null>(null)
@@ -44,8 +50,15 @@ export function CameraCapture({ onCapture }: { onCapture: (blob: Blob) => void }
         autoPlay
         playsInline
         muted
-        className="w-full aspect-[3/4] object-cover rounded-t-full"
+        className="w-full aspect-[3/4] object-cover"
       />
+      {frameUrl && (
+        <img
+          src={frameUrl}
+          alt=""
+          className="absolute inset-0 w-full aspect-[3/4] object-contain pointer-events-none"
+        />
+      )}
       <div className="flex justify-center gap-4 p-4">
         <Button
           type="button"

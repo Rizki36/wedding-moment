@@ -74,7 +74,17 @@ function GuestLandingPage() {
   }
 
   if (step === 'frame') {
-    return <FramePicker frames={frames} value={frameId} onChange={setFrameId} onSkip={() => setStep('capture')} />
+    return (
+      <FramePicker
+        frames={frames}
+        value={frameId}
+        onChange={(id) => {
+          setFrameId(id)
+          setStep('capture')
+        }}
+        onSkip={() => setStep('capture')}
+      />
+    )
   }
 
   // step === 'capture'
@@ -130,8 +140,12 @@ function CaptureStep({
 
   async function handlePhotoCapture(blob: Blob) {
     setPhotoBlob(blob)
-    const composited = await compositePhotoWithFrame(blob, frameUrl)
-    setCompositedBlob(composited)
+    try {
+      const composited = await compositePhotoWithFrame(blob, frameUrl)
+      setCompositedBlob(composited)
+    } catch {
+      setCompositedBlob(null)
+    }
     setSubStep('audio')
   }
 
@@ -211,7 +225,7 @@ function CaptureStep({
     }
   }
 
-  if (subStep === 'photo') return <CameraCapture onCapture={handlePhotoCapture} />
+  if (subStep === 'photo') return <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />
   if (subStep === 'audio') return <AudioRecorder onRecorded={handleAudioRecorded} />
 
   return (

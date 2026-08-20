@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { ArchImage } from '#/components/ui/ArchImage'
 import { Button } from '#/components/ui/Button'
 
 export function CapturePreview({
@@ -30,7 +29,11 @@ export function CapturePreview({
   return (
     <div className="flex flex-col items-center gap-4 p-6">
       {photoUrl && (
-        <ArchImage src={photoUrl} alt="Pratinjau foto" className="w-full max-w-sm aspect-[3/4]" />
+        <img
+          src={photoUrl}
+          alt="Pratinjau foto"
+          className="w-full max-w-sm aspect-[3/4] object-cover"
+        />
       )}
       <audio src={audioUrl} controls />
       <div className="flex gap-3 flex-wrap justify-center">
