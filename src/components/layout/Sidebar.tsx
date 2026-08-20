@@ -20,15 +20,15 @@ export function Sidebar({ role, open, onNavigate }: SidebarProps) {
         <button
           aria-label="Tutup menu"
           onClick={onNavigate}
-          className="fixed inset-0 z-20 bg-(--color-fg)/40 md:hidden"
+          className="fixed inset-0 z-20 bg-(--color-inverse-surface)/40 md:hidden"
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-(--color-fg)/10 bg-(--color-bg) p-6 transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-(--color-surface-container-lowest) p-6 shadow-[0_4px_20px_rgba(45,71,57,0.06)] transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 md:shadow-none md:border-r md:border-(--color-outline-variant) ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <Link to="/" className="font-(--font-display) text-xl text-(--color-fg)">
+        <Link to="/" className="font-(--font-display) text-xl text-(--color-on-surface)">
           Wedding Moment
         </Link>
 
@@ -40,8 +40,10 @@ export function Sidebar({ role, open, onNavigate }: SidebarProps) {
                 key={link.to}
                 to={link.to}
                 onClick={onNavigate}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  active ? 'bg-(--color-fg) text-(--color-bg)' : 'text-(--color-fg-muted) hover:bg-(--color-fg)/5'
+                className={`rounded px-4 py-2 text-sm font-medium transition ${
+                  active
+                    ? 'bg-(--color-primary-container) text-(--color-on-primary-container)'
+                    : 'text-(--color-on-surface-variant) hover:bg-(--color-surface-container)'
                 }`}
               >
                 {link.label}
@@ -52,7 +54,7 @@ export function Sidebar({ role, open, onNavigate }: SidebarProps) {
             <Link
               to="/admin"
               onClick={onNavigate}
-              className="mt-4 rounded-full px-4 py-2 text-sm font-medium text-(--color-fg-muted) hover:bg-(--color-fg)/5"
+              className="mt-4 rounded px-4 py-2 text-sm font-medium text-(--color-on-surface-variant) hover:bg-(--color-surface-container)"
             >
               Buka Panel Admin
             </Link>
@@ -61,7 +63,7 @@ export function Sidebar({ role, open, onNavigate }: SidebarProps) {
             <Link
               to="/dashboard"
               onClick={onNavigate}
-              className="mt-4 rounded-full px-4 py-2 text-sm font-medium text-(--color-fg-muted) hover:bg-(--color-fg)/5"
+              className="mt-4 rounded px-4 py-2 text-sm font-medium text-(--color-on-surface-variant) hover:bg-(--color-surface-container)"
             >
               Kembali ke Dashboard
             </Link>
