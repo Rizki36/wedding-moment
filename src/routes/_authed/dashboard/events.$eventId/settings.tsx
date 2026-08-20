@@ -26,14 +26,14 @@ function EventSettings() {
 
   return (
     <form onSubmit={handleSubmit} className="p-8 max-w-md flex flex-col gap-4">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg)">Pengaturan Acara</h1>
+      <h1 className="font-(--font-display) text-2xl text-(--color-on-surface)">Pengaturan Acara</h1>
       <input
         value={venue}
         onChange={(e) => setVenue(e.target.value)}
         placeholder="Lokasi"
-        className="border rounded px-3 py-2"
+        className="border-b-2 border-(--color-outline-variant) bg-(--color-surface-container-low) rounded px-3 py-2 text-(--color-on-surface) focus:border-(--color-primary) focus:outline-none transition-colors"
       />
-      {saved && <p className="text-sm text-(--color-fg-muted)">Tersimpan.</p>}
+      {saved && <p className="text-sm text-(--color-on-surface-variant)">Tersimpan.</p>}
       <Button type="submit">Simpan</Button>
     </form>
   )

@@ -18,12 +18,15 @@ function FramesPage() {
 
   return (
     <div className="p-8">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg) mb-4">Bingkai Foto</h1>
+      <h1 className="font-(--font-display) text-2xl text-(--color-on-surface) mb-4">Bingkai Foto</h1>
       <FrameUploadForm eventId={eventId} onUploaded={() => router.invalidate()} />
       <ul className="grid grid-cols-3 gap-4 mt-6">
         {frameList.map((frame) => (
-          <li key={frame.id} className="border rounded-2xl p-2">
-            <p className="text-sm">{frame.name}</p>
+          <li
+            key={frame.id}
+            className="bg-(--color-surface-container-lowest) rounded-lg shadow-[0_4px_20px_rgba(45,71,57,0.04)] p-2"
+          >
+            <p className="text-sm text-(--color-on-surface)">{frame.name}</p>
             <button
               onClick={async () => {
                 await deleteFrameFn({ data: { frameId: frame.id } })
@@ -36,7 +39,7 @@ function FramesPage() {
           </li>
         ))}
       </ul>
-      {frameList.length === 0 && <p className="text-(--color-fg-muted)">Belum ada bingkai.</p>}
+      {frameList.length === 0 && <p className="text-(--color-on-surface-variant)">Belum ada bingkai.</p>}
     </div>
   )
 }
