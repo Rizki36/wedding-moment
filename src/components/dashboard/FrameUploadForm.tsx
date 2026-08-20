@@ -33,7 +33,7 @@ export function FrameUploadForm({ eventId, onUploaded }: { eventId: string; onUp
   }
 
   return (
-    <label className="rounded-full border border-(--color-fg) px-4 py-2 cursor-pointer inline-block">
+    <label className="rounded border border-(--color-primary) text-(--color-primary) px-4 py-2 text-sm font-medium cursor-pointer inline-block transition hover:bg-(--color-primary-container)/40">
       {uploading ? 'Mengunggah...' : 'Unggah Bingkai (PNG)'}
       <input type="file" accept="image/png" onChange={handleFileChange} className="hidden" disabled={uploading} />
     </label>

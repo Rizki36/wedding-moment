@@ -5,7 +5,7 @@ export function BulkDownloadButton({ eventId }: { eventId: string }) {
   return (
     <a
       href={`/api/download/${eventId}.zip`}
-      className="rounded-full bg-(--color-fg) text-(--color-bg) px-6 py-3 inline-block font-medium transition hover:opacity-90"
+      className="rounded bg-(--color-primary) text-(--color-on-primary) px-6 py-3 inline-block font-medium transition hover:opacity-90"
     >
       Unduh Semua
     </a>
