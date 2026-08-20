@@ -16,10 +16,10 @@ function EventOverview() {
   const event = Route.useLoaderData()
   return (
     <div className="p-8">
-      <h1 className="font-(--font-display) text-2xl text-(--color-fg)">
+      <h1 className="font-(--font-display) text-2xl text-(--color-on-surface)">
         {event?.brideName} &amp; {event?.groomName}
       </h1>
-      <p className="text-(--color-fg-muted)">
+      <p className="text-(--color-on-surface-variant)">
         {event?.eventDate} — {event?.venue}
       </p>
       <LinkButton

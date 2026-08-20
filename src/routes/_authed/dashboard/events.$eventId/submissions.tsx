@@ -19,7 +19,7 @@ function SubmissionsPage() {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-(--font-display) text-2xl text-(--color-fg)">Ucapan Tamu</h1>
+        <h1 className="font-(--font-display) text-2xl text-(--color-on-surface)">Ucapan Tamu</h1>
         <BulkDownloadButton eventId={eventId} />
       </div>
       <SubmissionGrid submissions={submissionList} />
