@@ -1,54 +1,166 @@
-# DESIGN.md
+---
+name: Eternal Muse
+colors:
+  surface: '#fafaeb'
+  surface-dim: '#dbdbcd'
+  surface-bright: '#fafaeb'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#f4f5e6'
+  surface-container: '#efefe0'
+  surface-container-high: '#e9e9db'
+  surface-container-highest: '#e3e3d5'
+  on-surface: '#1b1c14'
+  on-surface-variant: '#4c463f'
+  inverse-surface: '#2f3128'
+  inverse-on-surface: '#f1f2e3'
+  outline: '#7e766e'
+  outline-variant: '#cfc5bc'
+  surface-tint: '#665d53'
+  primary: '#665d53'
+  on-primary: '#ffffff'
+  primary-container: '#f3e5d8'
+  on-primary-container: '#70665b'
+  inverse-primary: '#d1c4b8'
+  secondary: '#496455'
+  on-secondary: '#ffffff'
+  secondary-container: '#ccead6'
+  on-secondary-container: '#4f6a5b'
+  tertiary: '#70585b'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#ffe0e3'
+  on-tertiary-container: '#7a6164'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#eee0d3'
+  primary-fixed-dim: '#d1c4b8'
+  on-primary-fixed: '#211a13'
+  on-primary-fixed-variant: '#4e453c'
+  secondary-fixed: '#ccead6'
+  secondary-fixed-dim: '#b0cdbb'
+  on-secondary-fixed: '#062014'
+  on-secondary-fixed-variant: '#324c3e'
+  tertiary-fixed: '#fbdbde'
+  tertiary-fixed-dim: '#debfc2'
+  on-tertiary-fixed: '#281719'
+  on-tertiary-fixed-variant: '#574144'
+  background: '#fafaeb'
+  on-background: '#1b1c14'
+  surface-variant: '#e3e3d5'
+typography:
+  display-lg:
+    fontFamily: Playfair Display
+    fontSize: 48px
+    fontWeight: '700'
+    lineHeight: '1.2'
+    letterSpacing: -0.02em
+  headline-lg:
+    fontFamily: Playfair Display
+    fontSize: 32px
+    fontWeight: '600'
+    lineHeight: '1.3'
+  headline-lg-mobile:
+    fontFamily: Playfair Display
+    fontSize: 28px
+    fontWeight: '600'
+    lineHeight: '1.3'
+  headline-md:
+    fontFamily: Playfair Display
+    fontSize: 24px
+    fontWeight: '500'
+    lineHeight: '1.4'
+  body-lg:
+    fontFamily: Montserrat
+    fontSize: 18px
+    fontWeight: '400'
+    lineHeight: '1.6'
+  body-md:
+    fontFamily: Montserrat
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: '1.6'
+  label-md:
+    fontFamily: Montserrat
+    fontSize: 14px
+    fontWeight: '600'
+    lineHeight: '1.2'
+    letterSpacing: 0.05em
+  caption:
+    fontFamily: Montserrat
+    fontSize: 12px
+    fontWeight: '400'
+    lineHeight: '1.4'
+rounded:
+  sm: 0.25rem
+  DEFAULT: 0.5rem
+  md: 0.75rem
+  lg: 1rem
+  xl: 1.5rem
+  full: 9999px
+spacing:
+  unit: 8px
+  container-max: 1440px
+  gutter: 24px
+  margin-mobile: 16px
+  margin-desktop: 64px
+---
 
-Visual design system for Wedding Moment, derived from `src/styles.css` and current component usage. Read this before adding or changing UI — new screens should reuse these tokens and patterns rather than introducing new ones.
+## Brand & Style
 
-## Tokens
+The design system is centered on the concept of "Modern Romance." It targets couples planning high-end, bespoke weddings, evoking an emotional response of serenity, excitement, and luxury. The aesthetic is **Minimalist-Elegant**, characterized by generous white space, intentional alignment, and a refined editorial feel. 
 
-Defined in `src/styles.css` under `@theme` (Tailwind v4 CSS-variable theming — reference as `bg-(--color-x)`, `text-(--color-x)`, `font-(--font-x)`, not hardcoded hex/class names):
+The UI should feel like a premium physical invitation—tactile yet digital. It utilizes a soft-focus approach with high-quality photography as a primary design element, framed by structured, airy layouts. The visual language avoids clutter, opting for thin lines and subtle transitions to maintain a "breathable" and celebratory atmosphere.
 
-| Token | Value | Use |
-|---|---|---|
-| `--color-bg` | `#e8e6e1` (cream) | Page background |
-| `--color-fg` | `#1a2e1a` (dark green) | Primary text, borders, primary-button fill |
-| `--color-fg-muted` | `#3f4f3f` (muted green) | Secondary text (captions, helper copy, status text) |
-| `--color-accent` | `#e8425a` (coral/red) | Sparingly — accent badges only (e.g. the heart badge) |
-| `--font-display` | Fraunces (serif) | Headings only |
-| `--font-sans` | Inter | Body text, default (set on `body`) |
+## Colors
 
-There is no dark mode — the palette is fixed cream/green, not theme-conditional. Don't introduce `dark:` variants or alternate color tokens.
+The palette is anchored in **Clean Ivory (#FFFFF0)** for primary backgrounds to provide a warmer, more sophisticated feel than pure white. **Soft Champagne (#F3E5D8)** serves as the primary functional color, used for secondary surfaces, subtle hover states, and structural dividers. 
+
+**Deep Forest Green (#2D4739)** provides high-contrast accents for primary actions, navigation, and critical information, grounding the softer tones with a sense of timelessness. **Blush Pink (#FADADD)** is used sparingly for highlights, status indicators, or decorative elements to inject a romantic warmth without overwhelming the professional layout.
 
 ## Typography
 
-- Headings: `font-(--font-display)`, typically `uppercase`, `tracking-tight`, large sizes (`text-4xl sm:text-6xl` for hero, `text-xl` for form labels/section titles).
-- Body/UI text: default sans (Inter), `text-(--color-fg)` for primary, `text-(--color-fg-muted)` for secondary/helper text.
-- Errors: plain `text-red-600` (not a themed token — kept distinct from the palette so errors are unambiguous).
+This design system employs a classic serif/sans-serif pairing to balance tradition with modernity. **Playfair Display** is used for all headlines and display text, utilizing its high-contrast strokes to convey luxury. For large display titles, a slight negative letter-spacing is applied to enhance the editorial feel.
 
-## Shape & spacing
+**Montserrat** handles all functional and body text. Its geometric clarity ensures legibility across dense dashboard data (like guest lists or budget trackers). Labels use a slightly heavier weight and increased letter-spacing in uppercase to create clear hierarchy without needing large font sizes.
 
-- Buttons and pill-style inputs: `rounded-full`.
-- Cards and larger containers: `rounded-2xl`, inner elements (e.g. a card's image) `rounded-xl`.
-- Standard button padding: `px-6 py-3`. Standard card padding: `p-3`. Form padding: `p-6`.
-- Layout gaps use Tailwind's `gap-*` scale (`gap-2` within tight clusters like a card, `gap-4`–`gap-6` between form fields, `gap-6` in page-level flex columns).
-- Page containers: `min-h-screen`, content capped with `max-w-4xl mx-auto` (marketing) or `min(42rem, calc(100% - 2rem))` via the global `main` selector (default content width elsewhere).
+## Layout & Spacing
 
-## Components (`src/components/ui/`)
+The layout follows a **Fixed Grid** philosophy on desktop to maintain the high-end editorial look, centering content within a 1440px max-width container. A 12-column system is used with generous 24px gutters.
 
-- **`Button` / `LinkButton`** (`Button.tsx`) — the only button primitives. Two variants:
-  - `primary` (default): solid `bg-(--color-fg)` fill, `text-(--color-bg)` text, `hover:opacity-90`.
-  - `outline`: `border border-(--color-fg)`, `text-(--color-fg)`, `hover:bg-(--color-fg)/5`.
-  - Both share a `base` class (`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed`). Use `Button` for form submits/in-page actions, `LinkButton` for navigation — never a raw `<a>`/`<button>` styled ad hoc.
-- **`Badge`** (`Badge.tsx`) — circular accent dot (`w-10 h-10 rounded-full bg-(--color-accent) text-white`), used for the heart icon and similar single-glyph accents. This is the only place `--color-accent` should appear.
+Spacing follows an 8px rhythm. Significant vertical "breathing room" is prioritized; sections are separated by large margins (64px+) to prevent the interface from feeling crowded. On mobile, the grid collapses to a single column with 16px side margins, while padding within cards remains generous to maintain the airy aesthetic.
 
-Reuse these two primitives for any new button or accent-dot need before writing new classes.
+## Elevation & Depth
 
-## Patterns by surface
+Elevation in this design system is communicated through **Ambient Shadows** and **Tonal Layering** rather than heavy borders. 
 
-- **Marketing/landing** (`src/routes/index.tsx`): centered column, `Badge` → display heading → muted subtext → `LinkButton` row. Text-centered, generous vertical rhythm (`gap-6`, `py-16`).
-- **Guest capture flow** (`src/components/capture/*`, `src/routes/e/$eventSlug/*`): single-column, mobile-first, step-by-step (name → frame → photo → audio → preview → submit). Forms are plain stacked `flex flex-col gap-4` with pill inputs (`rounded-full border border-(--color-fg)/30 px-4 py-3 bg-(--color-bg)`). All copy is in Indonesian — keep new guest-facing strings in Indonesian for consistency (submit errors, labels, placeholders all follow this).
-- **Dashboard** (`src/components/dashboard/*`): card-based grids. `SubmissionCard` is the canonical card shape: `border border-(--color-fg) rounded-2xl p-3 flex flex-col gap-2`, with a full-width `rounded-xl` image, `font-medium` name, and a full-width `<audio>` control.
+Surfaces use a very soft, diffused shadow (Blur: 20px, Opacity: 4%, Color: Forest Green) to give the impression of paper floating slightly above a surface. High-priority interactive elements may use a subtle inner-glow in Champagne to suggest a pressed or tactile feel. Backdrop blurs (Glassmorphism) are reserved for navigation overlays and modal backgrounds to maintain a sense of depth while keeping the focus on the underlying photography.
 
-## Conventions to preserve
+## Shapes
 
-- Always reference color/font via the CSS-variable Tailwind syntax (`bg-(--color-bg)`, `font-(--font-display)`), never literal Tailwind palette classes (`bg-stone-100` etc.) or inline hex — keeps the palette centrally editable from `styles.css`.
-- Don't add new color tokens without strong reason; the palette is intentionally small (bg/fg/fg-muted/accent).
-- Guest-facing copy: Indonesian. Code/comments: English.
+The shape language is **Rounded**, utilizing a 0.5rem (8px) base radius. This softening of corners mirrors the organic nature of floral arrangements and wedding attire. 
+
+- **Standard Buttons & Inputs**: 8px (rounded-md)
+- **Cards & Large Containers**: 16px (rounded-lg)
+- **Profile Images & Status Tags**: Fully circular (pill-shaped) to provide visual contrast against the structured grid.
+
+## Components
+
+### Buttons
+Primary buttons use a solid Forest Green background with Ivory text, featuring a subtle 1px Champagne border on hover. Secondary buttons are outlined in Forest Green or are solid Ivory with a soft shadow.
+
+### Cards
+Cards are the primary container. They feature Ivory backgrounds, no borders, and soft ambient shadows. When used for "Venue" or "Inspiration" blocks, the top half of the card should be a full-bleed image with the typography nestled in generous padding below.
+
+### Input Fields
+Inputs are minimalist, using a bottom-border-only style or a very light Champagne background with an 8px radius. Focus states are indicated by a Forest Green bottom border transition.
+
+### Chips & Tags
+Used for guest RSVPs or vendor categories. These should use the Blush Pink or Champagne colors with "Label-MD" typography.
+
+### Progress Indicators
+Budget and task trackers should use thin, elegant lines. The "filled" portion of a progress bar uses a Forest Green to Blush Pink gradient to represent progress towards the wedding day.
+
+### Additional Components
+- **Countdown Timer**: A bespoke component using large Playfair Display numbers for the wedding date.
+- **Image Masonry**: A specialized layout component for mood boards, using varying aspect ratios with consistent 16px spacing.
