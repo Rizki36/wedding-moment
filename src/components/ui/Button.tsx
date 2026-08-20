@@ -3,12 +3,12 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 export type ButtonVariant = 'primary' | 'outline'
 
-const base = 'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed'
+const base = 'inline-flex items-center justify-center gap-2 rounded px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed'
 
 function variantClasses(variant: ButtonVariant) {
   return variant === 'primary'
-    ? `${base} bg-(--color-fg) text-(--color-bg) hover:opacity-90`
-    : `${base} border border-(--color-fg) text-(--color-fg) hover:bg-(--color-fg)/5`
+    ? `${base} bg-(--color-primary) text-(--color-on-primary) border border-transparent hover:border-(--color-primary-container)`
+    : `${base} border border-(--color-primary) text-(--color-primary) hover:bg-(--color-primary-container)/40`
 }
 
 type ButtonProps = {
