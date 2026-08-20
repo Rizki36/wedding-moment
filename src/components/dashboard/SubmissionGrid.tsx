@@ -4,7 +4,7 @@ type SubmissionWithUrls = { id: string; guestName: string; photoUrl: string; aud
 
 export function SubmissionGrid({ submissions }: { submissions: SubmissionWithUrls[] }) {
   if (submissions.length === 0) {
-    return <p className="text-(--color-fg-muted) p-8 text-center">Belum ada ucapan dari tamu.</p>
+    return <p className="text-(--color-on-surface-variant) p-8 text-center">Belum ada ucapan dari tamu.</p>
   }
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
