@@ -26,6 +26,8 @@ This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) an
 
 For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
 
+**Never add credentials via the Cloudflare dashboard's "Variables and Secrets" UI as a plain "Text" variable.** `wrangler.jsonc` has no `vars` block, so by default `wrangler deploy` deletes any dashboard-set variable on every deploy (it treats `wrangler.jsonc` as authoritative and wipes what isn't declared there) — this is why secrets can appear to "disappear" after a redeploy. `keep_vars: true` in `wrangler.jsonc` is a safety net against that, but the correct fix is to always set credentials as **Secret** type (via `wrangler secret put` or the dashboard's "Secret" option) — Cloudflare never deletes those on deploy, regardless of `keep_vars`.
+
 KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
 
 ### R2 bucket CORS

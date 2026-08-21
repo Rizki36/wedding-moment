@@ -21,5 +21,14 @@
       "enabled": true,
       "invocation_logs": true
     }
-  }
+  },
+  "vars": {
+    "BETTER_AUTH_URL": "https://wedding-moment.cahrizki-rf.workers.dev"
+  },
+  // Without this, `wrangler deploy` deletes any environment variable that
+  // was set via the Cloudflare dashboard (not `wrangler secret put`) before
+  // applying this file's config — since this file declares no `vars` block,
+  // that wipes them on every deploy. Secrets set via `wrangler secret put`
+  // are unaffected either way (Cloudflare never deletes those on deploy).
+  "keep_vars": true
 }
