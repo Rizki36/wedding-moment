@@ -12,10 +12,13 @@ export function CameraCapture({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
+  const [isMirrored, setIsMirrored] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [captureError, setCaptureError] = useState<string | null>(null)
   const [isReady, setIsReady] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
+
+  const effectiveMirror = facingMode === 'user' && isMirrored
 
   useEffect(() => {
     let stream: MediaStream | null = null
@@ -46,7 +49,13 @@ export function CameraCapture({
     setIsCapturing(true)
     setCaptureError(null)
     try {
-      const blob = await resizeAndCompress(videoRef.current, MAX_PHOTO_DIMENSION, 0.8, PHOTO_ASPECT_RATIO)
+      const blob = await resizeAndCompress(
+        videoRef.current,
+        MAX_PHOTO_DIMENSION,
+        0.8,
+        PHOTO_ASPECT_RATIO,
+        effectiveMirror,
+      )
       onCapture(blob)
     } catch {
       setCaptureError('Gagal mengambil foto. Silakan coba lagi.')
@@ -66,6 +75,7 @@ export function CameraCapture({
         muted
         onLoadedData={() => setIsReady(true)}
         className="w-full aspect-[3/4] object-cover"
+        style={effectiveMirror ? { transform: 'scaleX(-1)' } : undefined}
       />
       {frameUrl && (
         <img
@@ -84,6 +94,17 @@ export function CameraCapture({
         >
           Balik Kamera
         </Button>
+        {facingMode === 'user' && (
+          <Button
+            type="button"
+            variant="outline"
+            aria-pressed={isMirrored}
+            onClick={() => setIsMirrored((m) => !m)}
+            className={isMirrored ? 'bg-(--color-primary-container)/40' : ''}
+          >
+            Cerminkan
+          </Button>
+        )}
         <Button type="button" onClick={handleShutter} disabled={!isReady || isCapturing}>
           Ambil Foto
         </Button>

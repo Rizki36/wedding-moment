@@ -31,6 +31,33 @@ describe('resizeAndCompress', () => {
     const resultBitmap = await createImageBitmap(blob)
     expect(resultBitmap.width / resultBitmap.height).toBeCloseTo(3 / 4, 2)
   })
+
+  it('flips the image horizontally when mirror is true', async () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 200
+    canvas.height = 200
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = 'red'
+    ctx.fillRect(0, 0, 100, 200)
+    ctx.fillStyle = 'blue'
+    ctx.fillRect(100, 0, 100, 200)
+    const bitmap = await createImageBitmap(canvas)
+
+    const blob = await resizeAndCompress(bitmap, 200, 0.8, undefined, true)
+    const resultBitmap = await createImageBitmap(blob)
+
+    const readCanvas = document.createElement('canvas')
+    readCanvas.width = resultBitmap.width
+    readCanvas.height = resultBitmap.height
+    const readCtx = readCanvas.getContext('2d')!
+    readCtx.drawImage(resultBitmap, 0, 0)
+
+    const [leftR, , leftB] = readCtx.getImageData(10, 100, 1, 1).data
+    const [rightR, , rightB] = readCtx.getImageData(resultBitmap.width - 10, 100, 1, 1).data
+
+    expect(leftB).toBeGreaterThan(leftR)
+    expect(rightR).toBeGreaterThan(rightB)
+  })
 })
 
 describe('centerCropRect', () => {

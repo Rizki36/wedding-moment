@@ -17,6 +17,7 @@ export async function resizeAndCompress(
   maxDim: number,
   quality = 0.8,
   aspectRatio?: number,
+  mirror = false,
 ): Promise<Blob> {
   const sourceWidth = 'videoWidth' in source ? source.videoWidth : source.width
   const sourceHeight = 'videoHeight' in source ? source.videoHeight : source.height
@@ -33,6 +34,10 @@ export async function resizeAndCompress(
   canvas.width = targetWidth
   canvas.height = targetHeight
   const ctx = canvas.getContext('2d')!
+  if (mirror) {
+    ctx.translate(targetWidth, 0)
+    ctx.scale(-1, 1)
+  }
   ctx.drawImage(source, crop.sx, crop.sy, crop.sWidth, crop.sHeight, 0, 0, targetWidth, targetHeight)
 
   return new Promise((resolve, reject) => {
