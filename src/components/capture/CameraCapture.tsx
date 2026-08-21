@@ -71,6 +71,7 @@ export function CameraCapture({
         <img
           src={frameUrl}
           alt=""
+          crossOrigin="anonymous"
           className="absolute inset-0 w-full aspect-[3/4] object-contain pointer-events-none"
         />
       )}
