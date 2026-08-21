@@ -15,5 +15,11 @@
   // with the `x-cron-secret` header set to the deployed CRON_SECRET.
   "triggers": {
     "crons": ["0 2 * * *"]
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
   }
 }
