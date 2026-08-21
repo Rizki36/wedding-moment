@@ -13,10 +13,15 @@ export function CameraCapture({
   const videoRef = useRef<HTMLVideoElement>(null)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [error, setError] = useState<string | null>(null)
+  const [captureError, setCaptureError] = useState<string | null>(null)
+  const [isReady, setIsReady] = useState(false)
+  const [isCapturing, setIsCapturing] = useState(false)
 
   useEffect(() => {
     let stream: MediaStream | null = null
     let cancelled = false
+
+    setIsReady(false)
 
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode } })
@@ -37,9 +42,17 @@ export function CameraCapture({
   }, [facingMode])
 
   async function handleShutter() {
-    if (!videoRef.current) return
-    const blob = await resizeAndCompress(videoRef.current, MAX_PHOTO_DIMENSION, 0.8, PHOTO_ASPECT_RATIO)
-    onCapture(blob)
+    if (!videoRef.current || isCapturing) return
+    setIsCapturing(true)
+    setCaptureError(null)
+    try {
+      const blob = await resizeAndCompress(videoRef.current, MAX_PHOTO_DIMENSION, 0.8, PHOTO_ASPECT_RATIO)
+      onCapture(blob)
+    } catch {
+      setCaptureError('Gagal mengambil foto. Silakan coba lagi.')
+    } finally {
+      setIsCapturing(false)
+    }
   }
 
   if (error) return <p className="p-6 text-red-600">{error}</p>
@@ -51,6 +64,7 @@ export function CameraCapture({
         autoPlay
         playsInline
         muted
+        onLoadedData={() => setIsReady(true)}
         className="w-full aspect-[3/4] object-cover"
       />
       {frameUrl && (
@@ -60,6 +74,7 @@ export function CameraCapture({
           className="absolute inset-0 w-full aspect-[3/4] object-contain pointer-events-none"
         />
       )}
+      {captureError && <p className="px-4 pt-4 text-center text-red-600">{captureError}</p>}
       <div className="flex justify-center gap-4 p-4">
         <Button
           type="button"
@@ -68,7 +83,7 @@ export function CameraCapture({
         >
           Balik Kamera
         </Button>
-        <Button type="button" onClick={handleShutter}>
+        <Button type="button" onClick={handleShutter} disabled={!isReady || isCapturing}>
           Ambil Foto
         </Button>
       </div>
