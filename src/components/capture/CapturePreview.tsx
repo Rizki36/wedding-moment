@@ -10,7 +10,7 @@ export function CapturePreview({
   onSubmit,
 }: {
   photoBlob: Blob
-  audioUrl: string
+  audioUrl: string | null
   onRetakePhoto: () => void
   onReRecordAudio: () => void
   onDownloadPhoto: () => void
@@ -35,13 +35,17 @@ export function CapturePreview({
           className="w-full max-w-sm aspect-[3/4] object-cover"
         />
       )}
-      <audio src={audioUrl} controls />
+      {audioUrl ? (
+        <audio src={audioUrl} controls />
+      ) : (
+        <p className="text-(--color-on-surface-variant) text-sm">Tidak ada pesan suara</p>
+      )}
       <div className="flex gap-3 flex-wrap justify-center">
         <Button type="button" variant="outline" onClick={onRetakePhoto}>
           Ulangi Foto
         </Button>
         <Button type="button" variant="outline" onClick={onReRecordAudio}>
-          Rekam Ulang
+          {audioUrl ? 'Rekam Ulang' : 'Rekam Pesan Suara'}
         </Button>
         <Button type="button" variant="outline" onClick={onDownloadPhoto}>
           Unduh Foto

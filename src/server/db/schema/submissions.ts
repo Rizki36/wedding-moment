@@ -8,7 +8,7 @@ export const submissions = pgTable('submissions', {
   guestName: text('guest_name').notNull(),
   frameId: uuid('frame_id').references(() => frames.id, { onDelete: 'set null' }),
   photoObjectKey: text('photo_object_key').notNull(),
-  audioObjectKey: text('audio_object_key').notNull(),
+  audioObjectKey: text('audio_object_key'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => ({
   eventCreatedIdx: index('submissions_event_id_created_at_idx').on(table.eventId, table.createdAt),

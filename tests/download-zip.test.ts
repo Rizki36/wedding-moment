@@ -66,4 +66,38 @@ describe('buildSubmissionsZipResponse', () => {
     const response = await buildSubmissionsZipResponse('00000000-0000-0000-0000-000000000000')
     expect(response).toBeNull()
   })
+
+  it('omits the audio entry for a submission with no recorded audio', async () => {
+    const event = await createEvent({ ownerId: 'owner-zip-test-2', brideName: 'A', groomName: 'B', eventDate: '2026-09-01' })
+    const skipSubmissionId = 'sub-zip-2'
+    const skipPhotoKey = submissionPhotoKey(event.id, skipSubmissionId)
+
+    await r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${skipPhotoKey}`, {
+      method: 'PUT',
+      body: Buffer.from('fake-photo-bytes-no-audio'),
+      headers: { 'Content-Type': 'image/jpeg' },
+    })
+
+    const submission = await createSubmission({
+      eventId: event.id,
+      guestName: 'Tamu Tanpa Suara',
+      frameId: null,
+      photoObjectKey: skipPhotoKey,
+      audioObjectKey: null,
+    })
+
+    try {
+      const response = await buildSubmissionsZipResponse(event.id)
+      const zipBuffer = Buffer.from(await response!.arrayBuffer())
+      const zip = await JSZip.loadAsync(zipBuffer)
+      const fileNames = Object.keys(zip.files)
+
+      const photoEntry = fileNames.find((n) => n.includes(`Tamu Tanpa Suara-${submission!.id}`) && n.includes('photo.jpg'))
+      const audioEntry = fileNames.find((n) => n.includes(`Tamu Tanpa Suara-${submission!.id}`) && n.includes('audio'))
+      expect(photoEntry).toBeDefined()
+      expect(audioEntry).toBeUndefined()
+    } finally {
+      await r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${skipPhotoKey}`, { method: 'DELETE' })
+    }
+  }, 20000)
 })

@@ -25,6 +25,26 @@ describe('createSubmission', () => {
     expect(submission.frameId).toBeNull()
   })
 
+  it('creates a submission with no audio when the guest skips recording', async () => {
+    const event = await createEvent({
+      ownerId: 'test-owner',
+      brideName: 'A',
+      groomName: 'B',
+      eventDate: '2026-09-01',
+    })
+
+    const submission = await createSubmission({
+      eventId: event.id,
+      guestName: 'Tamu Tanpa Suara',
+      frameId: null,
+      photoObjectKey: `events/${event.id}/submissions/sub2/photo.jpg`,
+      audioObjectKey: null,
+    })
+
+    expect(submission.guestName).toBe('Tamu Tanpa Suara')
+    expect(submission.audioObjectKey).toBeNull()
+  })
+
   it('rejects a submission to a nonexistent event', async () => {
     await expect(
       createSubmission({

@@ -42,9 +42,11 @@ export const buildSubmissionsZipResponse = createServerOnlyFn(async (eventId: st
         yield { name: `${s.guestName}-${s.id}/photo.jpg`, input: photoRes.body }
       }
 
-      const audioRes = await getR2Object(s.audioObjectKey)
-      if (audioRes.ok && audioRes.body) {
-        yield { name: `${s.guestName}-${s.id}/audio${extname(s.audioObjectKey)}`, input: audioRes.body }
+      if (s.audioObjectKey) {
+        const audioRes = await getR2Object(s.audioObjectKey)
+        if (audioRes.ok && audioRes.body) {
+          yield { name: `${s.guestName}-${s.id}/audio${extname(s.audioObjectKey)}`, input: audioRes.body }
+        }
       }
     }
   }

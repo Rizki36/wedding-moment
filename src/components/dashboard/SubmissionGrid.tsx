@@ -1,6 +1,6 @@
 import { SubmissionCard } from './SubmissionCard'
 
-type SubmissionWithUrls = { id: string; guestName: string; photoUrl: string; audioUrl: string }
+type SubmissionWithUrls = { id: string; guestName: string; photoUrl: string; audioUrl: string | null }
 
 export function SubmissionGrid({ submissions }: { submissions: SubmissionWithUrls[] }) {
   if (submissions.length === 0) {

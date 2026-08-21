@@ -68,7 +68,7 @@ export const listSubmissionsForEventFn = createServerFn({ method: 'GET' })
         id: s.id,
         guestName: s.guestName,
         photoUrl: await getPresignedGetUrl(s.photoObjectKey),
-        audioUrl: await getPresignedGetUrl(s.audioObjectKey),
+        audioUrl: s.audioObjectKey ? await getPresignedGetUrl(s.audioObjectKey) : null,
       })),
     )
   })

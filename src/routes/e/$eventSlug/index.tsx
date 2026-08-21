@@ -168,6 +168,13 @@ function CaptureStep({
     setSubStep('audio')
   }
 
+  function handleSkipAudio() {
+    setAudioBlob(null)
+    setAudioUrl(null)
+    setAudioMimeType('')
+    setSubStep('preview')
+  }
+
   function handleDownloadPhoto() {
     if (!compositedBlob) return
     const url = URL.createObjectURL(compositedBlob)
@@ -197,15 +204,18 @@ function CaptureStep({
   }
 
   async function handleSubmit() {
-    if (!compositedBlob || !audioBlob) return
+    if (!compositedBlob) return
     setSubmitting(true)
     setError(null)
     try {
       const submissionId = nanoid(12)
       const photoKey = await uploadToR2('submission-photo', submissionId, compositedBlob, 'image/jpeg')
-      const ext = extensionForMimeType(audioMimeType)
-      const audioContentType = audioMimeType || 'audio/webm'
-      const audioKey = await uploadToR2('submission-audio', submissionId, audioBlob, audioContentType, ext)
+      let audioKey: string | null = null
+      if (audioBlob) {
+        const ext = extensionForMimeType(audioMimeType)
+        const audioContentType = audioMimeType || 'audio/webm'
+        audioKey = await uploadToR2('submission-audio', submissionId, audioBlob, audioContentType, ext)
+      }
 
       await createSubmissionFn({
         data: {
@@ -226,13 +236,13 @@ function CaptureStep({
   }
 
   if (subStep === 'photo') return <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />
-  if (subStep === 'audio') return <AudioRecorder onRecorded={handleAudioRecorded} />
+  if (subStep === 'audio') return <AudioRecorder onRecorded={handleAudioRecorded} onSkip={handleSkipAudio} />
 
   return (
     <div>
       <CapturePreview
         photoBlob={compositedBlob ?? photoBlob!}
-        audioUrl={audioUrl!}
+        audioUrl={audioUrl}
         onRetakePhoto={handleRetakePhoto}
         onReRecordAudio={handleReRecordAudio}
         onDownloadPhoto={handleDownloadPhoto}

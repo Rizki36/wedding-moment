@@ -42,7 +42,7 @@ describe('purge', () => {
       audioObjectKey: submissionAudioKey(event.id, 'sub-purge', 'webm'),
     })
     await putR2Object(submission.photoObjectKey, 'image/jpeg', 'x')
-    await putR2Object(submission.audioObjectKey, 'audio/webm', 'x')
+    await putR2Object(submission.audioObjectKey!, 'audio/webm', 'x')
 
     // Sanity check: objects really exist in R2 before purging.
     const before = await listR2ObjectsByPrefix(eventPrefix(event.id))

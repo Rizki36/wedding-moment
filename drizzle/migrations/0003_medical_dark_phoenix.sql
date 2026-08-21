@@ -1,0 +1,1 @@
+ALTER TABLE "submissions" ALTER COLUMN "audio_object_key" DROP NOT NULL;

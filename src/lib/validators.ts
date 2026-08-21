@@ -5,7 +5,7 @@ export const createSubmissionSchema = z.object({
   guestName: z.string().min(1).max(100),
   frameId: z.string().uuid().nullable(),
   photoObjectKey: z.string().min(1),
-  audioObjectKey: z.string().min(1),
+  audioObjectKey: z.string().min(1).nullable(),
 })
 
 export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>
