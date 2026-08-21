@@ -143,7 +143,8 @@ function CaptureStep({
     try {
       const composited = await compositePhotoWithFrame(blob, frameUrl)
       setCompositedBlob(composited)
-    } catch {
+    } catch (err) {
+      console.error('Frame compositing failed, falling back to unframed photo:', err)
       setCompositedBlob(null)
     }
     setSubStep('audio')

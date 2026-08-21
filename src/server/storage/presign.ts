@@ -21,8 +21,12 @@ export async function getPresignedUploadUrl(key: string, contentType: string): P
 }
 
 /**
- * Returns a short-lived (5 minute) presigned URL the client can GET the
- * object bytes from directly.
+ * Returns a presigned URL the client can GET the object bytes from
+ * directly, valid for 1 hour. Used both for guest-facing frame images
+ * (generated once at page load, then reused throughout the whole capture
+ * flow — see src/routes/e/$eventSlug/index.tsx) and for pengantin/admin
+ * dashboard submission media, so the expiry needs to comfortably outlive a
+ * slow guest session, not just a single fetch.
  *
  * Same authorization caveat as `getPresignedUploadUrl`: this helper does NOT
  * perform authorization — callers must verify the caller is allowed to read
@@ -30,7 +34,7 @@ export async function getPresignedUploadUrl(key: string, contentType: string): P
  */
 export async function getPresignedGetUrl(key: string): Promise<string> {
   const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`)
-  url.searchParams.set('X-Amz-Expires', '300')
+  url.searchParams.set('X-Amz-Expires', '3600')
 
   const signed = await r2Client.sign(new Request(url, { method: 'GET' }), {
     aws: { signQuery: true },
