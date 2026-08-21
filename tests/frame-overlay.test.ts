@@ -44,4 +44,12 @@ describe('compositePhotoWithFrame', () => {
     // Composited pixel should be a blend, not pure blue (0,0,255) nor pure red
     expect(pixel[0]).toBeGreaterThan(0)
   })
+
+  it('does not distort the frame when photo and frame are both 3:4 (non-square)', async () => {
+    const photo = await solidColorBlob('blue', 300, 400)
+    const frameUrl = await solidColorDataUrl('rgba(255,0,0,0.5)', 300, 400)
+    const result = await compositePhotoWithFrame(photo, frameUrl)
+    const bitmap = await createImageBitmap(result)
+    expect(bitmap.width / bitmap.height).toBeCloseTo(3 / 4, 2)
+  })
 })

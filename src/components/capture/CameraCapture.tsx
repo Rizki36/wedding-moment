@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { resizeAndCompress } from '#/lib/image'
+import { MAX_PHOTO_DIMENSION, PHOTO_ASPECT_RATIO } from '#/lib/constants'
 import { Button } from '#/components/ui/Button'
 
 export function CameraCapture({
@@ -37,7 +38,7 @@ export function CameraCapture({
 
   async function handleShutter() {
     if (!videoRef.current) return
-    const blob = await resizeAndCompress(videoRef.current, 1600)
+    const blob = await resizeAndCompress(videoRef.current, MAX_PHOTO_DIMENSION, 0.8, PHOTO_ASPECT_RATIO)
     onCapture(blob)
   }
 
