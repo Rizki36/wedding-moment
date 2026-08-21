@@ -154,3 +154,12 @@ export const listEventsForOwnerFn = createServerFn({ method: 'GET' })
     await requireAdmin()
     return listMyEvents(ownerId)
   })
+
+/** Admin-only: create an event owned by an arbitrary pengantin (`admin/pengantin.$id.events.new.tsx`). */
+export const createEventForOwnerFn = createServerFn({ method: 'POST' })
+  .validator((input: { ownerId: string } & CreateEventFormInput) => input)
+  .handler(async ({ data }) => {
+    await requireAdmin()
+    const { ownerId, ...rest } = data
+    return createEvent({ ...rest, ownerId })
+  })

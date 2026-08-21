@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { describe, it, expect } from 'vitest'
 import { createEvent, getEvent } from '../src/server/functions/events'
-import { requireEventOwner, requirePengantin } from '../src/server/auth/guards'
+import { requireAdmin, requireEventOwner, requirePengantin } from '../src/server/auth/guards'
 import { auth } from '../src/server/auth/auth'
 import { toPlaceholderEmail } from '../src/server/auth/placeholder-email'
 
@@ -87,5 +87,27 @@ describe('updateEventFn security: session + ownership required', () => {
     await expect(requireEventOwner(event.id, owner.headers)).resolves.toBeDefined()
     // A different authenticated pengantin is not.
     await expect(requireEventOwner(event.id, intruder.headers)).rejects.toBeDefined()
+  })
+})
+
+/**
+ * `createEventForOwnerFn` (src/server/functions/events.ts) is a
+ * `createServerFn`-wrapped RPC endpoint, so — as with `createEventFn` above
+ * — it can't be invoked directly in Vitest. What's tested here is the guard
+ * it calls before trusting the client-supplied `ownerId`: `requireAdmin`,
+ * which must reject both an unauthenticated caller and an authenticated
+ * non-admin (e.g. a pengantin trying to create an event "for themselves"
+ * through the admin-only endpoint). The underlying core logic — that
+ * `createEvent` accepts an arbitrary `ownerId` distinct from the caller —
+ * is already covered by the `createEvent` test above.
+ */
+describe('createEventForOwnerFn security: admin required', () => {
+  it('requireAdmin rejects a request with no session (unauthenticated RPC call)', async () => {
+    await expect(requireAdmin(new Headers())).rejects.toBeDefined()
+  })
+
+  it('requireAdmin rejects a real, authenticated non-admin (a plain pengantin)', async () => {
+    const pengantin = await signUpAndGetHeaders('Not Admin', `not-admin-evt-${Date.now()}`)
+    await expect(requireAdmin(pengantin.headers)).rejects.toBeDefined()
   })
 })

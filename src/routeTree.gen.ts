@@ -28,10 +28,12 @@ import { Route as AuthedAdminPengantinIdRouteImport } from './routes/_authed/adm
 import { Route as AuthedAdminPengantinNewRouteImport } from './routes/_authed/admin/pengantin.new'
 import { Route as AuthedDashboardEventsNewRouteImport } from './routes/_authed/dashboard/events.new'
 import { Route as AuthedAdminEventsEventIdQrRouteImport } from './routes/_authed/admin/events.$eventId.qr'
+import { Route as AuthedAdminPengantinIdIndexRouteImport } from './routes/_authed/admin/pengantin.$id.index'
 import { Route as AuthedDashboardEventsEventIdIndexRouteImport } from './routes/_authed/dashboard/events.$eventId/index'
 import { Route as AuthedDashboardEventsEventIdFramesRouteImport } from './routes/_authed/dashboard/events.$eventId/frames'
 import { Route as AuthedDashboardEventsEventIdSettingsRouteImport } from './routes/_authed/dashboard/events.$eventId/settings'
 import { Route as AuthedDashboardEventsEventIdSubmissionsRouteImport } from './routes/_authed/dashboard/events.$eventId/submissions'
+import { Route as AuthedAdminPengantinIdEventsNewRouteImport } from './routes/_authed/admin/pengantin.$id.events.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -131,6 +133,12 @@ const AuthedAdminEventsEventIdQrRoute =
     path: '/events/$eventId/qr',
     getParentRoute: () => AuthedAdminRoute,
   } as any)
+const AuthedAdminPengantinIdIndexRoute =
+  AuthedAdminPengantinIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedAdminPengantinIdRoute,
+  } as any)
 const AuthedDashboardEventsEventIdIndexRoute =
   AuthedDashboardEventsEventIdIndexRouteImport.update({
     id: '/events/$eventId/',
@@ -155,6 +163,12 @@ const AuthedDashboardEventsEventIdSubmissionsRoute =
     path: '/events/$eventId/submissions',
     getParentRoute: () => AuthedDashboardRoute,
   } as any)
+const AuthedAdminPengantinIdEventsNewRoute =
+  AuthedAdminPengantinIdEventsNewRouteImport.update({
+    id: '/events/new',
+    path: '/events/new',
+    getParentRoute: () => AuthedAdminPengantinIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -171,14 +185,16 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthedAdminIndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug/': typeof EEventSlugIndexRoute
-  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
+  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRouteWithChildren
   '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
+  '/admin/pengantin/$id/': typeof AuthedAdminPengantinIdIndexRoute
   '/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
+  '/admin/pengantin/$id/events/new': typeof AuthedAdminPengantinIdEventsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -193,14 +209,15 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthedAdminIndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug': typeof EEventSlugIndexRoute
-  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
   '/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
+  '/admin/pengantin/$id': typeof AuthedAdminPengantinIdIndexRoute
   '/dashboard/events/$eventId': typeof AuthedDashboardEventsEventIdIndexRoute
+  '/admin/pengantin/$id/events/new': typeof AuthedAdminPengantinIdEventsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -219,14 +236,16 @@ export interface FileRoutesById {
   '/_authed/admin/': typeof AuthedAdminIndexRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
   '/e/$eventSlug/': typeof EEventSlugIndexRoute
-  '/_authed/admin/pengantin/$id': typeof AuthedAdminPengantinIdRoute
+  '/_authed/admin/pengantin/$id': typeof AuthedAdminPengantinIdRouteWithChildren
   '/_authed/admin/pengantin/new': typeof AuthedAdminPengantinNewRoute
   '/_authed/dashboard/events/new': typeof AuthedDashboardEventsNewRoute
   '/_authed/admin/events/$eventId/qr': typeof AuthedAdminEventsEventIdQrRoute
   '/_authed/dashboard/events/$eventId/frames': typeof AuthedDashboardEventsEventIdFramesRoute
   '/_authed/dashboard/events/$eventId/settings': typeof AuthedDashboardEventsEventIdSettingsRoute
   '/_authed/dashboard/events/$eventId/submissions': typeof AuthedDashboardEventsEventIdSubmissionsRoute
+  '/_authed/admin/pengantin/$id/': typeof AuthedAdminPengantinIdIndexRoute
   '/_authed/dashboard/events/$eventId/': typeof AuthedDashboardEventsEventIdIndexRoute
+  '/_authed/admin/pengantin/$id/events/new': typeof AuthedAdminPengantinIdEventsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,7 +271,9 @@ export interface FileRouteTypes {
     | '/dashboard/events/$eventId/frames'
     | '/dashboard/events/$eventId/settings'
     | '/dashboard/events/$eventId/submissions'
+    | '/admin/pengantin/$id/'
     | '/dashboard/events/$eventId/'
+    | '/admin/pengantin/$id/events/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -267,14 +288,15 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/e/$eventSlug'
-    | '/admin/pengantin/$id'
     | '/admin/pengantin/new'
     | '/dashboard/events/new'
     | '/admin/events/$eventId/qr'
     | '/dashboard/events/$eventId/frames'
     | '/dashboard/events/$eventId/settings'
     | '/dashboard/events/$eventId/submissions'
+    | '/admin/pengantin/$id'
     | '/dashboard/events/$eventId'
+    | '/admin/pengantin/$id/events/new'
   id:
     | '__root__'
     | '/'
@@ -299,7 +321,9 @@ export interface FileRouteTypes {
     | '/_authed/dashboard/events/$eventId/frames'
     | '/_authed/dashboard/events/$eventId/settings'
     | '/_authed/dashboard/events/$eventId/submissions'
+    | '/_authed/admin/pengantin/$id/'
     | '/_authed/dashboard/events/$eventId/'
+    | '/_authed/admin/pengantin/$id/events/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -451,6 +475,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminEventsEventIdQrRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
+    '/_authed/admin/pengantin/$id/': {
+      id: '/_authed/admin/pengantin/$id/'
+      path: '/'
+      fullPath: '/admin/pengantin/$id/'
+      preLoaderRoute: typeof AuthedAdminPengantinIdIndexRouteImport
+      parentRoute: typeof AuthedAdminPengantinIdRoute
+    }
     '/_authed/dashboard/events/$eventId/': {
       id: '/_authed/dashboard/events/$eventId/'
       path: '/events/$eventId'
@@ -479,19 +510,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardEventsEventIdSubmissionsRouteImport
       parentRoute: typeof AuthedDashboardRoute
     }
+    '/_authed/admin/pengantin/$id/events/new': {
+      id: '/_authed/admin/pengantin/$id/events/new'
+      path: '/events/new'
+      fullPath: '/admin/pengantin/$id/events/new'
+      preLoaderRoute: typeof AuthedAdminPengantinIdEventsNewRouteImport
+      parentRoute: typeof AuthedAdminPengantinIdRoute
+    }
   }
 }
 
+interface AuthedAdminPengantinIdRouteChildren {
+  AuthedAdminPengantinIdIndexRoute: typeof AuthedAdminPengantinIdIndexRoute
+  AuthedAdminPengantinIdEventsNewRoute: typeof AuthedAdminPengantinIdEventsNewRoute
+}
+
+const AuthedAdminPengantinIdRouteChildren: AuthedAdminPengantinIdRouteChildren =
+  {
+    AuthedAdminPengantinIdIndexRoute: AuthedAdminPengantinIdIndexRoute,
+    AuthedAdminPengantinIdEventsNewRoute: AuthedAdminPengantinIdEventsNewRoute,
+  }
+
+const AuthedAdminPengantinIdRouteWithChildren =
+  AuthedAdminPengantinIdRoute._addFileChildren(
+    AuthedAdminPengantinIdRouteChildren,
+  )
+
 interface AuthedAdminRouteChildren {
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
-  AuthedAdminPengantinIdRoute: typeof AuthedAdminPengantinIdRoute
+  AuthedAdminPengantinIdRoute: typeof AuthedAdminPengantinIdRouteWithChildren
   AuthedAdminPengantinNewRoute: typeof AuthedAdminPengantinNewRoute
   AuthedAdminEventsEventIdQrRoute: typeof AuthedAdminEventsEventIdQrRoute
 }
 
 const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
-  AuthedAdminPengantinIdRoute: AuthedAdminPengantinIdRoute,
+  AuthedAdminPengantinIdRoute: AuthedAdminPengantinIdRouteWithChildren,
   AuthedAdminPengantinNewRoute: AuthedAdminPengantinNewRoute,
   AuthedAdminEventsEventIdQrRoute: AuthedAdminEventsEventIdQrRoute,
 }
