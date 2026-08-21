@@ -2,10 +2,11 @@ import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { auth } from '../auth/auth'
 import { requireAdmin } from '../auth/guards'
+import { toPlaceholderEmail } from '../auth/placeholder-email'
 import { db } from '../db/client'
 import { user } from '../db/schema'
 
-export type CreatePengantinInput = { name: string; email: string; password: string }
+export type CreatePengantinInput = { name: string; username: string; password: string }
 
 /**
  * Core logic, each wrapped in `createServerOnlyFn` (matching `guards.ts`'s
@@ -26,7 +27,13 @@ export type CreatePengantinInput = { name: string; email: string; password: stri
  */
 export const createPengantinAccount = createServerOnlyFn(async (input: CreatePengantinInput) => {
   const result = await auth.api.signUpEmail({
-    body: { name: input.name, email: input.email, password: input.password },
+    body: {
+      name: input.name,
+      email: toPlaceholderEmail(input.username),
+      username: input.username,
+      displayUsername: input.username,
+      password: input.password,
+    },
   })
   return result.user
 })

@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signUp } from '../server/auth/auth-client'
+import { toPlaceholderEmail } from '../server/auth/placeholder-email'
 import { Button } from '#/components/ui/Button'
 
 export const Route = createFileRoute('/register')({ component: RegisterPage })
@@ -10,13 +11,19 @@ const inputClass =
 
 function RegisterPage() {
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const { error } = await signUp.email({ name, email, password })
+    const { error } = await signUp.email({
+      name,
+      email: toPlaceholderEmail(username),
+      username,
+      displayUsername: username,
+      password,
+    })
     if (error) setError(error.message ?? 'Registrasi gagal')
     else window.location.href = '/dashboard'
   }
@@ -35,10 +42,9 @@ function RegisterPage() {
           className={inputClass}
         />
         <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          placeholder="Email"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
           required
           className={inputClass}
         />

@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { createEvent, getEvent } from '../src/server/functions/events'
 import { requireEventOwner, requirePengantin } from '../src/server/auth/guards'
 import { auth } from '../src/server/auth/auth'
+import { toPlaceholderEmail } from '../src/server/auth/placeholder-email'
 
 describe('createEvent', () => {
   it('creates an event with a computed retentionDeadline 30 days after eventDate', async () => {
@@ -39,9 +40,9 @@ describe('createEvent', () => {
  * flagged as missing. This mirrors the existing `tests/guards.test.ts`
  * pattern (`requireAdmin(new Headers())` rejects).
  */
-async function signUpAndGetHeaders(name: string, email: string) {
+async function signUpAndGetHeaders(name: string, username: string) {
   const { headers, response } = await auth.api.signUpEmail({
-    body: { name, email, password: 'password123' },
+    body: { name, email: toPlaceholderEmail(username), username, password: 'password123' },
     returnHeaders: true,
   })
   const setCookie = headers.get('set-cookie')
@@ -72,8 +73,8 @@ describe('updateEventFn security: session + ownership required', () => {
   })
 
   it('requireEventOwner rejects a real, authenticated non-owner', async () => {
-    const owner = await signUpAndGetHeaders('Owner', `owner-${Date.now()}@example.com`)
-    const intruder = await signUpAndGetHeaders('Intruder', `intruder-${Date.now()}@example.com`)
+    const owner = await signUpAndGetHeaders('Owner', `owner-${Date.now()}`)
+    const intruder = await signUpAndGetHeaders('Intruder', `intruder-${Date.now()}`)
 
     const event = await createEvent({
       ownerId: owner.userId,

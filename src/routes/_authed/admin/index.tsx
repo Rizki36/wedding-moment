@@ -19,7 +19,7 @@ function AdminHome() {
         {pengantinList.map((p) => (
           <li key={p.id}>
             <Link to="/admin/pengantin/$id" params={{ id: p.id }} className="text-(--color-on-surface)">
-              {p.name} — {p.email}
+              {p.name} — {p.username}
             </Link>
           </li>
         ))}

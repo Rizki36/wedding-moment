@@ -11,7 +11,7 @@ const inputClass =
 function NewPengantinPage() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -19,7 +19,7 @@ function NewPengantinPage() {
     e.preventDefault()
     setError(null)
     try {
-      const user = await createPengantinAccountFn({ data: { name, email, password } })
+      const user = await createPengantinAccountFn({ data: { name, username, password } })
       navigate({ to: '/admin/pengantin/$id', params: { id: user.id } })
     } catch {
       setError('Gagal membuat akun')
@@ -37,10 +37,9 @@ function NewPengantinPage() {
         className={inputClass}
       />
       <input
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        type="email"
-        placeholder="Email"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
         required
         className={inputClass}
       />

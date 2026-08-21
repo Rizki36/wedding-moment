@@ -9,14 +9,14 @@ const inputClass =
   'border-b-2 border-(--color-outline-variant) bg-(--color-surface-container-low) rounded px-4 py-3 text-(--color-on-surface) focus:border-(--color-primary) focus:outline-none transition-colors'
 
 function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    const { error } = await signIn.email({ email, password })
+    const { error } = await signIn.username({ username, password })
     if (error) setError(error.message ?? 'Login gagal')
     else window.location.href = '/dashboard'
   }
@@ -26,10 +26,9 @@ function LoginPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-4">
         <h1 className="font-(--font-display) text-3xl text-(--color-on-surface) text-center mb-2">Masuk</h1>
         <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          placeholder="Email"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
           required
           className={inputClass}
         />
