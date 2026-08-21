@@ -37,7 +37,7 @@ export function FramePicker({
           >
             {/* `objectKey` here is a presigned GET URL resolved by the route
                 loader, not a raw R2 object key — see index.tsx. */}
-            <img src={frame.objectKey} alt={frame.name ?? ''} />
+            <img src={frame.objectKey} alt={frame.name ?? ''} crossOrigin="anonymous" />
           </Radio>
         ))}
       </RadioGroup>
