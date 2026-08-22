@@ -240,12 +240,12 @@ export function AudioRecorder({
         type="button"
         aria-label="Mulai merekam"
         onClick={startRecording}
-        className="flex items-center justify-center w-24 h-24 rounded-full bg-(--color-primary) text-(--color-on-primary) shadow-[0_4px_20px_rgba(45,71,57,0.15)] transition hover:brightness-95"
+        className="flex items-center justify-center size-28 rounded-full bg-(--color-primary) text-(--color-on-primary) shadow-[0_4px_20px_rgba(45,71,57,0.15)] transition hover:brightness-95"
       >
         <MicIcon className="w-10 h-10" />
       </button>
 
-      <Button type="button" variant="outline" onClick={onSkip}>
+      <Button type="button" variant="text" onClick={onSkip}>
         Tanpa Pesan Suara
       </Button>
     </div>

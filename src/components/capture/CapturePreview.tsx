@@ -49,13 +49,15 @@ export function CapturePreview({
         <Button type="button" variant="outline" onClick={onReRecordAudio}>
           {audioUrl ? "Rekam Ulang" : "Rekam Pesan Suara"}
         </Button>
+      </div>
+      <div className="flex gap-3 flex-wrap justify-center">
         <Button type="button" variant="outline" onClick={onDownloadPhoto}>
           Unduh Foto
         </Button>
+        <Button type="button" onClick={onSubmit} className="!px-8">
+          Kirim
+        </Button>
       </div>
-      <Button type="button" onClick={onSubmit} className="!px-8">
-        Kirim
-      </Button>
     </div>
   );
 }
