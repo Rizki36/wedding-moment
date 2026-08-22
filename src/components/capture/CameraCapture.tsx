@@ -40,9 +40,8 @@ export function CameraCapture({
       .getUserMedia({
         video: {
           facingMode,
-          width: { ideal: 1080 },
+          width: { ideal: 1920 },
           height: { ideal: 1920 },
-          aspectRatio: { ideal: PHOTO_ASPECT_RATIO },
         },
       })
       .then((s) => {
