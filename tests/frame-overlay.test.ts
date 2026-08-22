@@ -51,11 +51,11 @@ describe("compositePhotoWithFrame", () => {
     expect(pixel[0]).toBeGreaterThan(0);
   });
 
-  it("does not distort the frame when photo and frame are both 3:4 (non-square)", async () => {
-    const photo = await solidColorBlob("blue", 300, 400);
-    const frameUrl = await solidColorDataUrl("rgba(255,0,0,0.5)", 300, 400);
+  it("does not distort the frame when photo and frame are both 9:16 (non-square)", async () => {
+    const photo = await solidColorBlob("blue", 450, 800);
+    const frameUrl = await solidColorDataUrl("rgba(255,0,0,0.5)", 450, 800);
     const result = await compositePhotoWithFrame(photo, frameUrl);
     const bitmap = await createImageBitmap(result);
-    expect(bitmap.width / bitmap.height).toBeCloseTo(3 / 4, 2);
+    expect(bitmap.width / bitmap.height).toBeCloseTo(9 / 16, 2);
   });
 });

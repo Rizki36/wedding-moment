@@ -32,7 +32,7 @@ export function CapturePreview({
         <img
           src={photoUrl}
           alt="Pratinjau foto"
-          className="w-full max-w-sm aspect-[3/4] object-cover"
+          className="w-full max-w-sm aspect-[9/16] object-cover"
         />
       )}
       {audioUrl ? (

@@ -76,7 +76,7 @@ export function CameraCapture({
         playsInline
         muted
         onLoadedData={() => setIsReady(true)}
-        className="w-full aspect-[3/4] object-cover"
+        className="w-full aspect-[9/16] object-cover"
         style={effectiveMirror ? { transform: "scaleX(-1)" } : undefined}
       />
       {frameUrl && (
@@ -84,7 +84,7 @@ export function CameraCapture({
           src={frameUrl}
           alt=""
           crossOrigin="anonymous"
-          className="absolute inset-0 w-full aspect-[3/4] object-contain pointer-events-none"
+          className="absolute inset-0 w-full aspect-[9/16] object-contain pointer-events-none"
         />
       )}
       {captureError && (

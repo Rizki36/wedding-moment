@@ -7,7 +7,7 @@ export async function compositePhotoWithFrame(
 ): Promise<Blob> {
   const photoBitmap = await createImageBitmap(photoBlob);
   const canvas = document.createElement("canvas");
-  // Assumes photoBlob is already cropped to PHOTO_ASPECT_RATIO (3:4) by
+  // Assumes photoBlob is already cropped to PHOTO_ASPECT_RATIO (9:16) by
   // resizeAndCompress — see src/lib/image.ts. If that invariant changes,
   // this canvas (and the frame image drawn onto it) will stretch again.
   canvas.width = photoBitmap.width;
