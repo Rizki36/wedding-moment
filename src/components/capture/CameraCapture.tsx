@@ -54,7 +54,7 @@ export function CameraCapture({
       const blob = await resizeAndCompress(
         videoRef.current,
         MAX_PHOTO_DIMENSION,
-        0.8,
+        1,
         PHOTO_ASPECT_RATIO,
         effectiveMirror,
       );
