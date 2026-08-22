@@ -14,7 +14,7 @@ export function GuestNameForm({
           e.preventDefault();
           if (name.trim()) onSubmit(name.trim());
         }}
-        className="flex flex-col gap-4 p-6 flex-1"
+        className="flex flex-col gap-4 p-6 flex-1 max-w-sm"
       >
         <label className="font-(--font-display) text-xl text-(--color-on-surface) text-center">
           Siapa nama Anda?
