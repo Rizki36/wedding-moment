@@ -34,6 +34,8 @@
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
+  --color-shutter: #d32f2f;
+  --color-shutter-ring: color-mix(in srgb, var(--color-shutter) 25%, transparent);
   --color-primary-fixed: #eee0d3;
   --color-primary-fixed-dim: #d1c4b8;
   --color-on-primary-fixed: #211a13;

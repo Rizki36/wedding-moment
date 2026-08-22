@@ -6,7 +6,7 @@ import { AudioRecorder } from "../../../components/capture/AudioRecorder";
 import { CameraCapture } from "../../../components/capture/CameraCapture";
 import { CapturePreview } from "../../../components/capture/CapturePreview";
 import { compositePhotoWithFrame } from "../../../components/capture/FrameOverlayCanvas";
-import { FramePicker, type Frame } from "../../../components/capture/FramePicker";
+import type { Frame } from "../../../components/capture/FramePicker";
 import { GuestNameForm } from "../../../components/capture/GuestNameForm";
 import { extensionForMimeType } from "../../../lib/audio-mime";
 import { getEventBySlug } from "../../../server/functions/events";
@@ -245,10 +245,13 @@ function CaptureStep({
 
   if (subStep === "photo")
     return (
-      <div>
-        <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />
-        <FramePicker frames={frames} value={frameId} onChange={setFrameId} />
-      </div>
+      <CameraCapture
+        onCapture={handlePhotoCapture}
+        frameUrl={frameUrl}
+        frames={frames}
+        frameId={frameId}
+        onFrameChange={setFrameId}
+      />
     );
   if (subStep === "audio")
     return (

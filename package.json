@@ -27,6 +27,7 @@
     "better-auth": "^1.6.29",
     "client-zip": "^2.5.0",
     "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.33.0",
     "nanoid": "^6.0.1",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
