@@ -22,13 +22,12 @@ export function centerCropRect(
   };
 }
 
-export async function resizeAndCompress(
+export function renderPhotoToCanvas(
   source: ImageBitmap | HTMLVideoElement,
   maxDim: number,
-  quality = 0.8,
   aspectRatio?: number,
   mirror = false,
-): Promise<Blob> {
+): HTMLCanvasElement {
   const sourceWidth = "videoWidth" in source ? source.videoWidth : source.width;
   const sourceHeight =
     "videoHeight" in source ? source.videoHeight : source.height;
@@ -61,6 +60,13 @@ export async function resizeAndCompress(
     targetHeight,
   );
 
+  return canvas;
+}
+
+export function canvasToJpegBlob(
+  canvas: HTMLCanvasElement,
+  quality: number,
+): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))),
@@ -68,4 +74,17 @@ export async function resizeAndCompress(
       quality,
     );
   });
+}
+
+export async function resizeAndCompress(
+  source: ImageBitmap | HTMLVideoElement,
+  maxDim: number,
+  quality = 0.8,
+  aspectRatio?: number,
+  mirror = false,
+): Promise<Blob> {
+  return canvasToJpegBlob(
+    renderPhotoToCanvas(source, maxDim, aspectRatio, mirror),
+    quality,
+  );
 }

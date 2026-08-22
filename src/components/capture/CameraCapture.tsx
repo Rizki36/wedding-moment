@@ -1,7 +1,7 @@
 import { FlipHorizontal, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { MAX_PHOTO_DIMENSION, PHOTO_ASPECT_RATIO } from "#/lib/constants";
-import { resizeAndCompress } from "#/lib/image";
+import { renderPhotoToCanvas } from "#/lib/image";
 import { type Frame, FramePicker } from "./FramePicker";
 
 const iconButtonClasses =
@@ -14,7 +14,7 @@ export function CameraCapture({
   frameId,
   onFrameChange,
 }: {
-  onCapture: (blob: Blob) => void;
+  onCapture: (canvas: HTMLCanvasElement) => void;
   frameUrl?: string | null;
   frames: Frame[];
   frameId: string | null;
@@ -61,14 +61,13 @@ export function CameraCapture({
     setIsCapturing(true);
     setCaptureError(null);
     try {
-      const blob = await resizeAndCompress(
+      const canvas = renderPhotoToCanvas(
         videoRef.current,
         MAX_PHOTO_DIMENSION,
-        1,
         PHOTO_ASPECT_RATIO,
         effectiveMirror,
       );
-      onCapture(blob);
+      onCapture(canvas);
     } catch {
       setCaptureError("Gagal mengambil foto. Silakan coba lagi.");
     } finally {

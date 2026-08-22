@@ -1,19 +1,25 @@
+import { canvasToJpegBlob } from "#/lib/image";
+
 // Composites a transparent frame PNG over a captured photo using canvas.
-// Browser-only (canvas, Image, createImageBitmap) — must only be called from
-// client code (event handlers / effects), never at module scope.
+// Browser-only (canvas, Image) — must only be called from client code (event
+// handlers / effects), never at module scope.
+//
+// Takes the already-rendered photo canvas (from CameraCapture's
+// renderPhotoToCanvas — already cropped to PHOTO_ASPECT_RATIO, scaled, and
+// mirrored) and draws it plus an optional frame overlay onto a fresh canvas,
+// encoding to JPEG exactly once. Do not decode-then-redraw an already-encoded
+// blob here — that reintroduces the double-compression pipeline this
+// function was rewritten to avoid.
 export async function compositePhotoWithFrame(
-  photoBlob: Blob,
+  photoCanvas: HTMLCanvasElement,
   frameUrl: string | null,
+  quality: number,
 ): Promise<Blob> {
-  const photoBitmap = await createImageBitmap(photoBlob);
   const canvas = document.createElement("canvas");
-  // Assumes photoBlob is already cropped to PHOTO_ASPECT_RATIO (9:16) by
-  // resizeAndCompress — see src/lib/image.ts. If that invariant changes,
-  // this canvas (and the frame image drawn onto it) will stretch again.
-  canvas.width = photoBitmap.width;
-  canvas.height = photoBitmap.height;
+  canvas.width = photoCanvas.width;
+  canvas.height = photoCanvas.height;
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(photoBitmap, 0, 0);
+  ctx.drawImage(photoCanvas, 0, 0);
 
   if (frameUrl) {
     const frameImg = new Image();
@@ -26,11 +32,5 @@ export async function compositePhotoWithFrame(
     ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
   }
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))),
-      "image/jpeg",
-      0.85,
-    );
-  });
+  return canvasToJpegBlob(canvas, quality);
 }

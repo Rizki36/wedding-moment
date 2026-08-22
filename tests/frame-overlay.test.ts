@@ -1,13 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { compositePhotoWithFrame } from "../src/components/capture/FrameOverlayCanvas";
 
-function solidColorBlob(color: string, w: number, h: number): Promise<Blob> {
+function solidColorCanvas(
+  color: string,
+  w: number,
+  h: number,
+): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, w, h);
+  return canvas;
+}
+
+function solidColorBlob(color: string, w: number, h: number): Promise<Blob> {
+  const canvas = solidColorCanvas(color, w, h);
   return new Promise((resolve) =>
     canvas.toBlob((b) => resolve(b!), "image/png"),
   );
@@ -29,15 +38,15 @@ async function solidColorDataUrl(
 
 describe("compositePhotoWithFrame", () => {
   it("returns the original photo re-encoded as JPEG when no frame is given", async () => {
-    const photo = await solidColorBlob("blue", 400, 400);
-    const result = await compositePhotoWithFrame(photo, null);
+    const photo = solidColorCanvas("blue", 400, 400);
+    const result = await compositePhotoWithFrame(photo, null, 0.92);
     expect(result.type).toBe("image/jpeg");
   });
 
   it("layers a transparent frame PNG on top of the photo", async () => {
-    const photo = await solidColorBlob("blue", 400, 400);
+    const photo = solidColorCanvas("blue", 400, 400);
     const frameUrl = await solidColorDataUrl("rgba(255,0,0,0.5)", 400, 400);
-    const result = await compositePhotoWithFrame(photo, frameUrl);
+    const result = await compositePhotoWithFrame(photo, frameUrl, 0.92);
     expect(result.type).toBe("image/jpeg");
 
     const bitmap = await createImageBitmap(result);
@@ -52,9 +61,9 @@ describe("compositePhotoWithFrame", () => {
   });
 
   it("does not distort the frame when photo and frame are both 9:16 (non-square)", async () => {
-    const photo = await solidColorBlob("blue", 450, 800);
+    const photo = solidColorCanvas("blue", 450, 800);
     const frameUrl = await solidColorDataUrl("rgba(255,0,0,0.5)", 450, 800);
-    const result = await compositePhotoWithFrame(photo, frameUrl);
+    const result = await compositePhotoWithFrame(photo, frameUrl, 0.92);
     const bitmap = await createImageBitmap(result);
     expect(bitmap.width / bitmap.height).toBeCloseTo(9 / 16, 2);
   });

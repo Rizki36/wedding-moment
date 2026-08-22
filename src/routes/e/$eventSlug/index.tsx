@@ -9,6 +9,8 @@ import { compositePhotoWithFrame } from "../../../components/capture/FrameOverla
 import type { Frame } from "../../../components/capture/FramePicker";
 import { GuestNameForm } from "../../../components/capture/GuestNameForm";
 import { extensionForMimeType } from "../../../lib/audio-mime";
+import { PHOTO_JPEG_QUALITY } from "../../../lib/constants";
+import { canvasToJpegBlob } from "../../../lib/image";
 import { getEventBySlug } from "../../../server/functions/events";
 import { listFramesForEvent } from "../../../server/functions/frames";
 import { createSubmissionFn } from "../../../server/functions/submissions";
@@ -117,7 +119,6 @@ function CaptureStep({
 }) {
   const navigate = useNavigate();
   const [subStep, setSubStep] = useState<CaptureSubStep>("photo");
-  const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
   const [compositedBlob, setCompositedBlob] = useState<Blob | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -127,17 +128,22 @@ function CaptureStep({
   const [frameId, setFrameId] = useState<string | null>(null);
   const frameUrl = frames.find((f) => f.id === frameId)?.objectKey ?? null;
 
-  async function handlePhotoCapture(blob: Blob) {
-    setPhotoBlob(blob);
+  async function handlePhotoCapture(canvas: HTMLCanvasElement) {
     try {
-      const composited = await compositePhotoWithFrame(blob, frameUrl);
-      setCompositedBlob(composited);
+      const finalBlob = frameUrl
+        ? await compositePhotoWithFrame(canvas, frameUrl, PHOTO_JPEG_QUALITY)
+        : await canvasToJpegBlob(canvas, PHOTO_JPEG_QUALITY);
+      setCompositedBlob(finalBlob);
     } catch (err) {
       console.error(
         "Frame compositing failed, falling back to unframed photo:",
         err,
       );
-      setCompositedBlob(null);
+      try {
+        setCompositedBlob(await canvasToJpegBlob(canvas, PHOTO_JPEG_QUALITY));
+      } catch {
+        setCompositedBlob(null);
+      }
     }
     setSubStep("audio");
   }
@@ -150,7 +156,6 @@ function CaptureStep({
   }
 
   function handleRetakePhoto() {
-    setPhotoBlob(null);
     setCompositedBlob(null);
     setSubStep("photo");
   }
@@ -261,10 +266,18 @@ function CaptureStep({
       />
     );
 
+  if (!compositedBlob) {
+    return (
+      <p className="p-6 text-center text-red-600">
+        Gagal memproses foto. Silakan ulangi pengambilan foto.
+      </p>
+    );
+  }
+
   return (
     <div>
       <CapturePreview
-        photoBlob={compositedBlob ?? photoBlob!}
+        photoBlob={compositedBlob}
         audioUrl={audioUrl}
         onRetakePhoto={handleRetakePhoto}
         onReRecordAudio={handleReRecordAudio}
