@@ -6,7 +6,7 @@ import { AudioRecorder } from "../../../components/capture/AudioRecorder";
 import { CameraCapture } from "../../../components/capture/CameraCapture";
 import { CapturePreview } from "../../../components/capture/CapturePreview";
 import { compositePhotoWithFrame } from "../../../components/capture/FrameOverlayCanvas";
-import { FramePicker } from "../../../components/capture/FramePicker";
+import { FramePicker, type Frame } from "../../../components/capture/FramePicker";
 import { GuestNameForm } from "../../../components/capture/GuestNameForm";
 import { extensionForMimeType } from "../../../lib/audio-mime";
 import { getEventBySlug } from "../../../server/functions/events";
@@ -50,13 +50,12 @@ export const Route = createFileRoute("/e/$eventSlug/")({
   component: GuestLandingPage,
 });
 
-type Step = "name" | "frame" | "capture";
+type Step = "name" | "capture";
 
 function GuestLandingPage() {
   const { event, frames } = Route.useLoaderData();
   const [step, setStep] = useState<Step>("name");
   const [guestName, setGuestName] = useState("");
-  const [frameId, setFrameId] = useState<string | null>(null);
 
   if (!event) {
     return (
@@ -73,35 +72,19 @@ function GuestLandingPage() {
       <GuestNameForm
         onSubmit={(name) => {
           setGuestName(name);
-          setStep("frame");
-        }}
-      />
-    );
-  }
-
-  if (step === "frame") {
-    return (
-      <FramePicker
-        frames={frames}
-        value={frameId}
-        onChange={(id) => {
-          setFrameId(id);
           setStep("capture");
         }}
-        onSkip={() => setStep("capture")}
       />
     );
   }
 
   // step === 'capture'
-  const selectedFrame = frames.find((f) => f.id === frameId);
   return (
     <CaptureStep
       eventId={event.id}
       eventSlug={event.slug}
       guestName={guestName}
-      frameId={frameId}
-      frameUrl={selectedFrame?.objectKey ?? null}
+      frames={frames}
     />
   );
 }
@@ -125,14 +108,12 @@ function CaptureStep({
   eventId,
   eventSlug,
   guestName,
-  frameId,
-  frameUrl,
+  frames,
 }: {
   eventId: string;
   eventSlug: string;
   guestName: string;
-  frameId: string | null;
-  frameUrl: string | null;
+  frames: Frame[];
 }) {
   const navigate = useNavigate();
   const [subStep, setSubStep] = useState<CaptureSubStep>("photo");
@@ -143,6 +124,8 @@ function CaptureStep({
   const [audioMimeType, setAudioMimeType] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [frameId, setFrameId] = useState<string | null>(null);
+  const frameUrl = frames.find((f) => f.id === frameId)?.objectKey ?? null;
 
   async function handlePhotoCapture(blob: Blob) {
     setPhotoBlob(blob);
@@ -261,7 +244,12 @@ function CaptureStep({
   }
 
   if (subStep === "photo")
-    return <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />;
+    return (
+      <div>
+        <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />
+        <FramePicker frames={frames} value={frameId} onChange={setFrameId} />
+      </div>
+    );
   if (subStep === "audio")
     return (
       <AudioRecorder
