@@ -3,8 +3,10 @@ import { Button } from "#/components/ui/Button";
 
 export function GuestNameForm({
   onSubmit,
+  coverImageUrl,
 }: {
   onSubmit: (name: string) => void;
+  coverImageUrl?: string | null;
 }) {
   const [name, setName] = useState("");
   return (
@@ -16,6 +18,13 @@ export function GuestNameForm({
         }}
         className="flex flex-col gap-4 p-6 flex-1 max-w-sm"
       >
+        {coverImageUrl && (
+          <img
+            src={coverImageUrl}
+            alt=""
+            className="aspect-square w-full object-cover rounded-(--radius-md)"
+          />
+        )}
         <label
           htmlFor="name"
           className="font-(--font-display) text-xl text-(--color-on-surface) text-center"

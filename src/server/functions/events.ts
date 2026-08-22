@@ -8,6 +8,7 @@ import {
 } from "../auth/guards";
 import { db } from "../db/client";
 import { events } from "../db/schema";
+import { getPresignedGetUrl } from "../storage/presign";
 
 export type CreateEventInput = {
   ownerId: string;
@@ -17,7 +18,9 @@ export type CreateEventInput = {
   venue?: string;
 };
 
-export type UpdateEventInput = Partial<Omit<CreateEventInput, "ownerId">>;
+export type UpdateEventInput = Partial<Omit<CreateEventInput, "ownerId">> & {
+  coverImageKey?: string | null;
+};
 
 /** Fields a caller is allowed to change through `updateEventFn`. Deliberately
  * excludes `ownerId`, `id`, `slug`, `status`, `retentionDeadline`, `purgedAt`,
@@ -27,6 +30,7 @@ const EDITABLE_UPDATE_FIELDS = [
   "groomName",
   "eventDate",
   "venue",
+  "coverImageKey",
 ] as const;
 
 function pickEditableFields(input: Record<string, unknown>): UpdateEventInput {
@@ -156,7 +160,15 @@ export const getEventFn = createServerFn({ method: "GET" })
     // `requireEventOwner` allows admins through, so this single endpoint
     // serves both the pengantin dashboard and the admin QR page.
     await requireEventOwner(eventId);
-    return getEvent(eventId);
+    const event = await getEvent(eventId);
+    if (!event?.coverImageKey) return event;
+    // `coverImageKey` is overwritten with a short-lived presigned GET URL
+    // so the Settings page can preview it directly — cover images live in
+    // a private R2 bucket, same as frames (see `listFramesForEventFn`).
+    return {
+      ...event,
+      coverImageKey: await getPresignedGetUrl(event.coverImageKey),
+    };
   });
 
 export const listMyEventsFn = createServerFn({ method: "GET" }).handler(

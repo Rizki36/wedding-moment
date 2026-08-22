@@ -7,7 +7,11 @@ import {
   requirePengantin,
 } from "../src/server/auth/guards";
 import { toPlaceholderEmail } from "../src/server/auth/placeholder-email";
-import { createEvent, getEvent } from "../src/server/functions/events";
+import {
+  createEvent,
+  getEvent,
+  updateEvent,
+} from "../src/server/functions/events";
 
 describe("createEvent", () => {
   it("creates an event with a computed retentionDeadline 30 days after eventDate", async () => {
@@ -28,6 +32,26 @@ describe("createEvent", () => {
 
     const fetched = await getEvent(event.id);
     expect(fetched?.brideName).toBe("Siti");
+  });
+});
+
+describe("updateEvent coverImageKey", () => {
+  it("persists a coverImageKey and can clear it back to null", async () => {
+    const event = await createEvent({
+      ownerId: "test-owner-id",
+      brideName: "Wati",
+      groomName: "Yanto",
+      eventDate: "2026-09-15",
+    });
+    expect(event.coverImageKey).toBeNull();
+
+    const updated = await updateEvent(event.id, {
+      coverImageKey: "events/some-event/cover.jpg",
+    });
+    expect(updated.coverImageKey).toBe("events/some-event/cover.jpg");
+
+    const cleared = await updateEvent(event.id, { coverImageKey: null });
+    expect(cleared.coverImageKey).toBeNull();
   });
 });
 

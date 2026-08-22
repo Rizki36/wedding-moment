@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { requireEventOwner } from "../../server/auth/guards";
 import { getEvent } from "../../server/functions/events";
 import {
+  eventCoverImageKey,
   frameKey,
   submissionAudioKey,
   submissionPhotoKey,
@@ -14,6 +15,10 @@ import { getPresignedUploadUrl } from "../../server/storage/presign";
  * - `kind: 'frame'` (the original behavior, unchanged): requires
  *   `requireEventOwner` since only the owning pengantin may upload frames
  *   for their event.
+ * - `kind: 'cover-image'`: same `requireEventOwner` gate as `frame`, for the
+ *   single per-event 1:1 cover image shown above the guest name form.
+ *   Restricted to `image/jpeg`/`image/png` here (not just client-side)
+ *   since the key's extension is derived from `contentType`.
  * - `kind: 'submission-photo' | 'submission-audio'`: guests are anonymous
  *   and never log in, so there is no session to check ownership against.
  *   Instead the target event must exist and be `active` before a
@@ -54,6 +59,37 @@ export const Route = createFileRoute("/api/uploads/presign")({
           }
 
           const key = frameKey(eventId, frameId);
+          const url = await getPresignedUploadUrl(key, contentType);
+          return Response.json({ url, key });
+        }
+
+        if (kind === "cover-image") {
+          if (!eventId || !contentType) {
+            return Response.json(
+              { error: "eventId and contentType are required" },
+              { status: 400 },
+            );
+          }
+          const ext =
+            contentType === "image/jpeg"
+              ? "jpg"
+              : contentType === "image/png"
+                ? "png"
+                : null;
+          if (!ext) {
+            return Response.json(
+              { error: "contentType must be image/jpeg or image/png" },
+              { status: 400 },
+            );
+          }
+
+          try {
+            await requireEventOwner(eventId);
+          } catch {
+            return Response.json({ error: "Forbidden" }, { status: 403 });
+          }
+
+          const key = eventCoverImageKey(eventId, ext);
           const url = await getPresignedUploadUrl(key, contentType);
           return Response.json({ url, key });
         }

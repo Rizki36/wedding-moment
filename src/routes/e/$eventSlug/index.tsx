@@ -43,7 +43,14 @@ const getGuestLandingDataFn = createServerFn({ method: "GET" })
         objectKey: await getPresignedGetUrl(f.objectKey),
       })),
     );
-    return { event, frames: framesWithUrls };
+    // Same presigned-URL treatment for the event's cover image, if set.
+    const eventWithCoverUrl = event.coverImageKey
+      ? {
+          ...event,
+          coverImageKey: await getPresignedGetUrl(event.coverImageKey),
+        }
+      : event;
+    return { event: eventWithCoverUrl, frames: framesWithUrls };
   });
 
 export const Route = createFileRoute("/e/$eventSlug/")({
@@ -76,6 +83,7 @@ function GuestLandingPage() {
           setGuestName(name);
           setStep("capture");
         }}
+        coverImageUrl={event.coverImageKey}
       />
     );
   }

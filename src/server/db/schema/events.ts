@@ -17,6 +17,7 @@ export const events = pgTable(
     groomName: text("groom_name").notNull(),
     eventDate: date("event_date").notNull(),
     venue: text("venue"),
+    coverImageKey: text("cover_image_key"),
     status: text("status").notNull().default("active"),
     retentionDeadline: timestamp("retention_deadline", {
       withTimezone: true,
