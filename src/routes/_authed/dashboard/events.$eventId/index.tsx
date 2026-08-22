@@ -22,23 +22,26 @@ function EventOverview() {
       <p className="text-(--color-on-surface-variant)">
         {event?.eventDate} — {event?.venue}
       </p>
-      <LinkButton
-        to="/dashboard/events/$eventId/frames"
-        params={{ eventId: event?.id ?? "" }}
-        variant="outline"
-        className="mt-4"
-      >
-        Kelola Bingkai
-      </LinkButton>
-      <LinkButton
-        to="/dashboard/events/$eventId/submissions"
-        params={{ eventId: event?.id ?? "" }}
-        variant="outline"
-        className="mt-4 ml-2"
-      >
-        Lihat Ucapan Tamu
-      </LinkButton>
-      {event && <QrCodeCard eventId={event.id} slug={event.slug} />}
+      <div className="flex items-center mb-3">
+        <LinkButton
+          to="/dashboard/events/$eventId/frames"
+          params={{ eventId: event?.id ?? "" }}
+          variant="outline"
+          className="mt-4"
+        >
+          Kelola Bingkai
+        </LinkButton>
+        <LinkButton
+          to="/dashboard/events/$eventId/submissions"
+          params={{ eventId: event?.id ?? "" }}
+          variant="outline"
+          className="mt-4 ml-2"
+        >
+          Lihat Ucapan Tamu
+        </LinkButton>
+      </div>
+
+      {event && <div className="flex"><QrCodeCard eventId={event.id} slug={event.slug} /></div>}
     </div>
   );
 }
