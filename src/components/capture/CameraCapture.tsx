@@ -37,7 +37,14 @@ export function CameraCapture({
     setIsReady(false);
 
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode } })
+      .getUserMedia({
+        video: {
+          facingMode,
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+          aspectRatio: { ideal: PHOTO_ASPECT_RATIO },
+        },
+      })
       .then((s) => {
         if (cancelled) {
           s.getTracks().forEach((t) => t.stop());

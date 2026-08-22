@@ -19,6 +19,8 @@ export async function compositePhotoWithFrame(
   canvas.width = photoCanvas.width;
   canvas.height = photoCanvas.height;
   const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(photoCanvas, 0, 0);
 
   if (frameUrl) {

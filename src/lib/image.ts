@@ -44,6 +44,8 @@ export function renderPhotoToCanvas(
   canvas.width = targetWidth;
   canvas.height = targetHeight;
   const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   if (mirror) {
     ctx.translate(targetWidth, 0);
     ctx.scale(-1, 1);
