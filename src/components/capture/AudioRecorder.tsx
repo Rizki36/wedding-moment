@@ -30,6 +30,7 @@ function MicIcon({ className = "" }: { className?: string }) {
       strokeWidth="1.5"
       className={className}
     >
+      <title>Mic</title>
       <rect x="7" y="2" width="6" height="10" rx="3" />
       <path
         d="M4 9.5a6 6 0 0 0 12 0M10 15.5v2.5M7 18h6"
@@ -43,6 +44,7 @@ function MicIcon({ className = "" }: { className?: string }) {
 function PauseIcon({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <title>Pause</title>
       <rect x="5" y="4" width="3.5" height="12" rx="1" />
       <rect x="11.5" y="4" width="3.5" height="12" rx="1" />
     </svg>
@@ -52,6 +54,7 @@ function PauseIcon({ className = "" }: { className?: string }) {
 function PlayIcon({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <title>Play</title>
       <path d="M6 4.5v11l9-5.5z" />
     </svg>
   );
@@ -82,7 +85,9 @@ export function AudioRecorder({
         recorder.onstop = null;
         recorder.ondataavailable = null;
         recorder.stop();
-        recorder.stream.getTracks().forEach((t) => t.stop());
+        recorder.stream.getTracks().forEach((t) => {
+          t.stop();
+        });
       }
     };
   }, []);
@@ -114,7 +119,9 @@ export function AudioRecorder({
 
       recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
       recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach((t) => {
+          t.stop();
+        });
         const blob = new Blob(chunksRef.current, {
           type: mimeTypeRef.current || "audio/webm",
         });

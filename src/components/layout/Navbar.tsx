@@ -24,6 +24,7 @@ export function Navbar({ userName, role, onMenuClick }: NavbarProps) {
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between bg-(--color-surface-container-lowest) px-4 py-3 shadow-[0_2px_12px_rgba(45,71,57,0.05)] md:px-8">
       <button
+        type="button"
         aria-label="Buka menu"
         onClick={onMenuClick}
         className="rounded p-2 hover:bg-(--color-surface-container) md:hidden"
@@ -36,6 +37,7 @@ export function Navbar({ userName, role, onMenuClick }: NavbarProps) {
           stroke="currentColor"
           strokeWidth="1.5"
         >
+          <title>Buka menu</title>
           <path d="M2 5h16M2 10h16M2 15h16" strokeLinecap="round" />
         </svg>
       </button>
@@ -51,6 +53,7 @@ export function Navbar({ userName, role, onMenuClick }: NavbarProps) {
         </div>
         <Badge>{userName.charAt(0).toUpperCase()}</Badge>
         <button
+          type="button"
           onClick={handleLogout}
           className="rounded border border-(--color-primary) px-4 py-2 text-sm font-medium text-(--color-primary) transition hover:bg-(--color-primary-container)/40"
         >

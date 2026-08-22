@@ -41,6 +41,7 @@ function FramesPage() {
             />
             <p className="text-sm text-(--color-on-surface)">{frame.name}</p>
             <button
+              type="button"
               onClick={async () => {
                 await deleteFrameFn({ data: { frameId: frame.id } });
                 router.invalidate();

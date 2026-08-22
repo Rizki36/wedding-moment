@@ -41,7 +41,11 @@ function EventOverview() {
         </LinkButton>
       </div>
 
-      {event && <div className="flex"><QrCodeCard eventId={event.id} slug={event.slug} /></div>}
+      {event && (
+        <div className="flex">
+          <QrCodeCard eventId={event.id} slug={event.slug} />
+        </div>
+      )}
     </div>
   );
 }

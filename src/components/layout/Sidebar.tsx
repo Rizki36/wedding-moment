@@ -18,6 +18,7 @@ export function Sidebar({ role, open, onNavigate }: SidebarProps) {
     <>
       {open && (
         <button
+          type="button"
           aria-label="Tutup menu"
           onClick={onNavigate}
           className="fixed inset-0 z-20 bg-(--color-inverse-surface)/40 md:hidden"

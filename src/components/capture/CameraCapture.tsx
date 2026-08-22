@@ -47,7 +47,9 @@ export function CameraCapture({
       })
       .then((s) => {
         if (cancelled) {
-          s.getTracks().forEach((t) => t.stop());
+          s.getTracks().forEach((t) => {
+            t.stop();
+          });
           return;
         }
         stream = s;
@@ -59,7 +61,9 @@ export function CameraCapture({
 
     return () => {
       cancelled = true;
-      stream?.getTracks().forEach((t) => t.stop());
+      stream?.getTracks().forEach((t) => {
+        t.stop();
+      });
     };
   }, [facingMode]);
 

@@ -16,10 +16,14 @@ export function GuestNameForm({
         }}
         className="flex flex-col gap-4 p-6 flex-1 max-w-sm"
       >
-        <label className="font-(--font-display) text-xl text-(--color-on-surface) text-center">
+        <label
+          htmlFor="name"
+          className="font-(--font-display) text-xl text-(--color-on-surface) text-center"
+        >
           Siapa nama Anda?
         </label>
         <input
+          id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nama Anda"
