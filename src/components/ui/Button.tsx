@@ -1,7 +1,7 @@
 import { Link, type LinkProps } from "@tanstack/react-router";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export type ButtonVariant = "primary" | "outline";
+export type ButtonVariant = "primary" | "outline" | "text";
 
 const base =
   "inline-flex items-center justify-center gap-2 rounded px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed";
@@ -11,9 +11,10 @@ export const primaryButtonVariantClasses =
   "bg-(--color-primary) text-(--color-on-primary) border border-transparent hover:border-(--color-primary-container)";
 
 function variantClasses(variant: ButtonVariant) {
-  return variant === "primary"
-    ? `${base} ${primaryButtonVariantClasses}`
-    : `${base} border border-(--color-primary) text-(--color-primary) hover:bg-(--color-primary-container)/40`;
+  if (variant === "primary") return `${base} ${primaryButtonVariantClasses}`;
+  if (variant === "outline")
+    return `${base} border border-(--color-primary) text-(--color-primary) hover:bg-(--color-primary-container)/40`;
+  return `${base} border border-transparent text-(--color-primary) hover:bg-(--color-primary-container)/40`;
 }
 
 type ButtonProps = {
