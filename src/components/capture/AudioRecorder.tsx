@@ -165,7 +165,7 @@ export function AudioRecorder({
 
   if (recording) {
     return (
-      <div className="flex flex-col items-center gap-6 p-6">
+      <div className="flex flex-col items-center gap-6 p-6 min-h-screen justify-center">
         <h2 className="font-(--font-display) text-xl text-(--color-on-surface)">
           Rekam Pesan Suara
         </h2>
@@ -228,7 +228,7 @@ export function AudioRecorder({
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 p-6">
+    <div className="flex flex-col items-center gap-6 p-6 min-h-screen justify-center">
       <h2 className="font-(--font-display) text-xl text-(--color-on-surface)">
         Rekam Pesan Suara
       </h2>
