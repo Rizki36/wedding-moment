@@ -34,6 +34,11 @@ function FramesPage() {
       <ul className="grid grid-cols-3 gap-4 mt-6">
         {frameList.map((frame) => (
           <li key={frame.id} className={`${cardClasses} p-2`}>
+            <img
+              src={frame.objectKey}
+              alt={frame.name ?? ""}
+              className="w-full aspect-[9/16] object-contain rounded-(--radius-md) bg-(--color-surface-variant)"
+            />
             <p className="text-sm text-(--color-on-surface)">{frame.name}</p>
             <button
               onClick={async () => {

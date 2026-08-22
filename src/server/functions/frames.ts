@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { requireEventOwner } from "../auth/guards";
 import { db } from "../db/client";
 import { frames } from "../db/schema";
+import { getPresignedGetUrl } from "../storage/presign";
 
 /**
  * Core DB logic, each wrapped in `createServerOnlyFn` — see `events.ts` for
@@ -53,7 +54,16 @@ export const listFramesForEventFn = createServerFn({ method: "GET" })
   .validator((eventId: string) => eventId)
   .handler(async ({ data: eventId }) => {
     await requireEventOwner(eventId);
-    return listFramesForEvent(eventId);
+    const frameList = await listFramesForEvent(eventId);
+    // `objectKey` is overwritten with a short-lived presigned GET URL so the
+    // dashboard preview can load it directly — frame PNGs live in a private
+    // R2 bucket, not a public one.
+    return Promise.all(
+      frameList.map(async (f) => ({
+        ...f,
+        objectKey: await getPresignedGetUrl(f.objectKey),
+      })),
+    );
   });
 
 export const createFrameFn = createServerFn({ method: "POST" })
