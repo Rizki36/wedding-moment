@@ -1,36 +1,39 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { signUp } from '../server/auth/auth-client'
-import { toPlaceholderEmail } from '../server/auth/placeholder-email'
-import { Button } from '#/components/ui/Button'
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { Button } from "#/components/ui/Button";
+import { signUp } from "../server/auth/auth-client";
+import { toPlaceholderEmail } from "../server/auth/placeholder-email";
 
-export const Route = createFileRoute('/register')({ component: RegisterPage })
+export const Route = createFileRoute("/register")({ component: RegisterPage });
 
 const inputClass =
-  'border-b-2 border-(--color-outline-variant) bg-(--color-surface-container-low) rounded px-4 py-3 text-(--color-on-surface) focus:border-(--color-primary) focus:outline-none transition-colors'
+  "border-b-2 border-(--color-outline-variant) bg-(--color-surface-container-low) rounded px-4 py-3 text-(--color-on-surface) focus:border-(--color-primary) focus:outline-none transition-colors";
 
 function RegisterPage() {
-  const [name, setName] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
     const { error } = await signUp.email({
       name,
       email: toPlaceholderEmail(username),
       username,
       displayUsername: username,
       password,
-    })
-    if (error) setError(error.message ?? 'Registrasi gagal')
-    else window.location.href = '/dashboard'
+    });
+    if (error) setError(error.message ?? "Registrasi gagal");
+    else window.location.href = "/dashboard";
   }
 
   return (
     <main className="bg-(--color-surface) min-h-screen flex items-center justify-center px-6">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm flex flex-col gap-4"
+      >
         <h1 className="font-(--font-display) text-3xl text-(--color-on-surface) text-center mb-2">
           Daftar sebagai Pengantin
         </h1>
@@ -62,5 +65,5 @@ function RegisterPage() {
         </Button>
       </form>
     </main>
-  )
+  );
 }

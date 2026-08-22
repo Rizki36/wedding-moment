@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { requireEventOwner } from '../../server/auth/guards'
-import { buildSubmissionsZipResponse } from '../../server/functions/download'
+import { createFileRoute } from "@tanstack/react-router";
+import { requireEventOwner } from "../../server/auth/guards";
+import { buildSubmissionsZipResponse } from "../../server/functions/download";
 
 /**
  * Streaming bulk ZIP download of every guest submission (photo + audio) for
@@ -18,20 +18,21 @@ import { buildSubmissionsZipResponse } from '../../server/functions/download'
  * pattern for the QR route, which resolves to `/api/qr/{$eventId}.png`.
  * This file resolves to `/api/download/{$eventId}.zip`.
  */
-export const Route = createFileRoute('/api/download/{$eventId}.zip')({
+export const Route = createFileRoute("/api/download/{$eventId}.zip")({
   server: {
     handlers: {
       GET: async ({ params }: { params: { eventId: string } }) => {
         try {
-          await requireEventOwner(params.eventId)
+          await requireEventOwner(params.eventId);
         } catch {
-          return Response.json({ error: 'Forbidden' }, { status: 403 })
+          return Response.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const response = await buildSubmissionsZipResponse(params.eventId)
-        if (!response) return Response.json({ error: 'Not found' }, { status: 404 })
-        return response
+        const response = await buildSubmissionsZipResponse(params.eventId);
+        if (!response)
+          return Response.json({ error: "Not found" }, { status: 404 });
+        return response;
       },
     },
   },
-})
+});

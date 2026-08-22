@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const createSubmissionSchema = z.object({
   eventId: z.string().uuid(),
@@ -6,6 +6,6 @@ export const createSubmissionSchema = z.object({
   frameId: z.string().uuid().nullable(),
   photoObjectKey: z.string().min(1),
   audioObjectKey: z.string().min(1).nullable(),
-})
+});
 
-export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>
+export type CreateSubmissionInput = z.infer<typeof createSubmissionSchema>;

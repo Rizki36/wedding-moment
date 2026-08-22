@@ -1,30 +1,35 @@
-import 'dotenv/config'
-import { describe, it, expect } from 'vitest'
-import { createEvent, getEvent } from '../src/server/functions/events'
-import { requireAdmin, requireEventOwner, requirePengantin } from '../src/server/auth/guards'
-import { auth } from '../src/server/auth/auth'
-import { toPlaceholderEmail } from '../src/server/auth/placeholder-email'
+import "dotenv/config";
+import { describe, expect, it } from "vitest";
+import { auth } from "../src/server/auth/auth";
+import {
+  requireAdmin,
+  requireEventOwner,
+  requirePengantin,
+} from "../src/server/auth/guards";
+import { toPlaceholderEmail } from "../src/server/auth/placeholder-email";
+import { createEvent, getEvent } from "../src/server/functions/events";
 
-describe('createEvent', () => {
-  it('creates an event with a computed retentionDeadline 30 days after eventDate', async () => {
+describe("createEvent", () => {
+  it("creates an event with a computed retentionDeadline 30 days after eventDate", async () => {
     const event = await createEvent({
-      ownerId: 'test-owner-id',
-      brideName: 'Siti',
-      groomName: 'Budi',
-      eventDate: '2026-09-01',
-      venue: 'Balai Kartini',
-    })
+      ownerId: "test-owner-id",
+      brideName: "Siti",
+      groomName: "Budi",
+      eventDate: "2026-09-01",
+      venue: "Balai Kartini",
+    });
 
-    expect(event.slug).toBeTruthy()
-    const retention = new Date(event.retentionDeadline)
-    const eventDate = new Date('2026-09-01')
-    const diffDays = (retention.getTime() - eventDate.getTime()) / (1000 * 60 * 60 * 24)
-    expect(diffDays).toBe(30)
+    expect(event.slug).toBeTruthy();
+    const retention = new Date(event.retentionDeadline);
+    const eventDate = new Date("2026-09-01");
+    const diffDays =
+      (retention.getTime() - eventDate.getTime()) / (1000 * 60 * 60 * 24);
+    expect(diffDays).toBe(30);
 
-    const fetched = await getEvent(event.id)
-    expect(fetched?.brideName).toBe('Siti')
-  })
-})
+    const fetched = await getEvent(event.id);
+    expect(fetched?.brideName).toBe("Siti");
+  });
+});
 
 /**
  * `createEventFn`/`updateEventFn` (src/server/functions/events.ts) are
@@ -42,53 +47,67 @@ describe('createEvent', () => {
  */
 async function signUpAndGetHeaders(name: string, username: string) {
   const { headers, response } = await auth.api.signUpEmail({
-    body: { name, email: toPlaceholderEmail(username), username, password: 'password123' },
+    body: {
+      name,
+      email: toPlaceholderEmail(username),
+      username,
+      password: "password123",
+    },
     returnHeaders: true,
-  })
-  const setCookie = headers.get('set-cookie')
-  if (!setCookie) throw new Error('sign up did not return a session cookie')
+  });
+  const setCookie = headers.get("set-cookie");
+  if (!setCookie) throw new Error("sign up did not return a session cookie");
   // Keep only the `name=value` pair(s), strip cookie attributes (Path, HttpOnly, etc.)
   const cookie = setCookie
-    .split(',')
-    .map((part) => part.split(';')[0].trim())
-    .join('; ')
-  return { headers: new Headers({ cookie }), userId: response.user.id }
+    .split(",")
+    .map((part) => part.split(";")[0].trim())
+    .join("; ");
+  return { headers: new Headers({ cookie }), userId: response.user.id };
 }
 
-describe('createEventFn security: session required', () => {
-  it('requirePengantin rejects a request with no session (unauthenticated RPC call)', async () => {
-    await expect(requirePengantin(new Headers())).rejects.toBeDefined()
-  })
-})
+describe("createEventFn security: session required", () => {
+  it("requirePengantin rejects a request with no session (unauthenticated RPC call)", async () => {
+    await expect(requirePengantin(new Headers())).rejects.toBeDefined();
+  });
+});
 
-describe('updateEventFn security: session + ownership required', () => {
-  it('requireEventOwner rejects a request with no session (unauthenticated RPC call)', async () => {
+describe("updateEventFn security: session + ownership required", () => {
+  it("requireEventOwner rejects a request with no session (unauthenticated RPC call)", async () => {
     const event = await createEvent({
-      ownerId: 'test-owner-id',
-      brideName: 'Ani',
-      groomName: 'Bram',
-      eventDate: '2026-09-05',
-    })
-    await expect(requireEventOwner(event.id, new Headers())).rejects.toBeDefined()
-  })
+      ownerId: "test-owner-id",
+      brideName: "Ani",
+      groomName: "Bram",
+      eventDate: "2026-09-05",
+    });
+    await expect(
+      requireEventOwner(event.id, new Headers()),
+    ).rejects.toBeDefined();
+  });
 
-  it('requireEventOwner rejects a real, authenticated non-owner', async () => {
-    const owner = await signUpAndGetHeaders('Owner', `owner-${Date.now()}`)
-    const intruder = await signUpAndGetHeaders('Intruder', `intruder-${Date.now()}`)
+  it("requireEventOwner rejects a real, authenticated non-owner", async () => {
+    const owner = await signUpAndGetHeaders("Owner", `owner-${Date.now()}`);
+    const intruder = await signUpAndGetHeaders(
+      "Intruder",
+      `intruder-${Date.now()}`,
+    );
 
     const event = await createEvent({
       ownerId: owner.userId,
-      brideName: 'Cinta',
-      groomName: 'Dedi',
-      eventDate: '2026-09-10',
-    })
+      brideName: "Cinta",
+      groomName: "Dedi",
+      eventDate: "2026-09-10",
+    });
 
     // The owner is allowed through.
-    await expect(requireEventOwner(event.id, owner.headers)).resolves.toBeDefined()
+    await expect(
+      requireEventOwner(event.id, owner.headers),
+    ).resolves.toBeDefined();
     // A different authenticated pengantin is not.
-    await expect(requireEventOwner(event.id, intruder.headers)).rejects.toBeDefined()
-  })
-})
+    await expect(
+      requireEventOwner(event.id, intruder.headers),
+    ).rejects.toBeDefined();
+  });
+});
 
 /**
  * `createEventForOwnerFn` (src/server/functions/events.ts) is a
@@ -101,13 +120,16 @@ describe('updateEventFn security: session + ownership required', () => {
  * `createEvent` accepts an arbitrary `ownerId` distinct from the caller —
  * is already covered by the `createEvent` test above.
  */
-describe('createEventForOwnerFn security: admin required', () => {
-  it('requireAdmin rejects a request with no session (unauthenticated RPC call)', async () => {
-    await expect(requireAdmin(new Headers())).rejects.toBeDefined()
-  })
+describe("createEventForOwnerFn security: admin required", () => {
+  it("requireAdmin rejects a request with no session (unauthenticated RPC call)", async () => {
+    await expect(requireAdmin(new Headers())).rejects.toBeDefined();
+  });
 
-  it('requireAdmin rejects a real, authenticated non-admin (a plain pengantin)', async () => {
-    const pengantin = await signUpAndGetHeaders('Not Admin', `not-admin-evt-${Date.now()}`)
-    await expect(requireAdmin(pengantin.headers)).rejects.toBeDefined()
-  })
-})
+  it("requireAdmin rejects a real, authenticated non-admin (a plain pengantin)", async () => {
+    const pengantin = await signUpAndGetHeaders(
+      "Not Admin",
+      `not-admin-evt-${Date.now()}`,
+    );
+    await expect(requireAdmin(pengantin.headers)).rejects.toBeDefined();
+  });
+});

@@ -1,4 +1,4 @@
-import { AwsClient } from 'aws4fetch'
+import { AwsClient } from "aws4fetch";
 
 // `@aws-sdk/client-s3` is unusable under Cloudflare's `workerd` runtime (the
 // runtime for `pnpm dev`, `pnpm run preview`, and the real Workers deploy
@@ -12,13 +12,13 @@ import { AwsClient } from 'aws4fetch'
 export const r2Client = new AwsClient({
   accessKeyId: process.env.R2_ACCESS_KEY_ID!,
   secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  service: 's3',
-  region: 'auto',
-})
+  service: "s3",
+  region: "auto",
+});
 
-export const R2_ENDPOINT = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+export const R2_ENDPOINT = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
 
-export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!
+export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!;
 
 /**
  * Streams an object directly from R2 via a signed GET request, server-side.
@@ -34,7 +34,9 @@ export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!
  * must verify the caller is allowed to read `key` before calling this.
  */
 export async function getR2Object(key: string): Promise<Response> {
-  return r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`, { method: 'GET' })
+  return r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`, {
+    method: "GET",
+  });
 }
 
 /**
@@ -50,33 +52,37 @@ export async function getR2Object(key: string): Promise<Response> {
  * `IsTruncated` / `NextContinuationToken` fields, also regex-extracted.
  */
 export async function listR2ObjectsByPrefix(prefix: string): Promise<string[]> {
-  const keys: string[] = []
-  let continuationToken: string | undefined
+  const keys: string[] = [];
+  let continuationToken: string | undefined;
 
   do {
-    const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}`)
-    url.searchParams.set('list-type', '2')
-    url.searchParams.set('prefix', prefix)
+    const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}`);
+    url.searchParams.set("list-type", "2");
+    url.searchParams.set("prefix", prefix);
     if (continuationToken) {
-      url.searchParams.set('continuation-token', continuationToken)
+      url.searchParams.set("continuation-token", continuationToken);
     }
 
-    const res = await r2Client.fetch(url, { method: 'GET' })
+    const res = await r2Client.fetch(url, { method: "GET" });
     if (!res.ok) {
-      throw new Error(`listR2ObjectsByPrefix failed: ${res.status} ${await res.text()}`)
+      throw new Error(
+        `listR2ObjectsByPrefix failed: ${res.status} ${await res.text()}`,
+      );
     }
-    const body = await res.text()
+    const body = await res.text();
 
     for (const match of body.matchAll(/<Key>([^<]*)<\/Key>/g)) {
-      keys.push(match[1])
+      keys.push(match[1]);
     }
 
-    const isTruncated = /<IsTruncated>true<\/IsTruncated>/.test(body)
-    const tokenMatch = body.match(/<NextContinuationToken>([^<]*)<\/NextContinuationToken>/)
-    continuationToken = isTruncated && tokenMatch ? tokenMatch[1] : undefined
-  } while (continuationToken)
+    const isTruncated = /<IsTruncated>true<\/IsTruncated>/.test(body);
+    const tokenMatch = body.match(
+      /<NextContinuationToken>([^<]*)<\/NextContinuationToken>/,
+    );
+    continuationToken = isTruncated && tokenMatch ? tokenMatch[1] : undefined;
+  } while (continuationToken);
 
-  return keys
+  return keys;
 }
 
 /**
@@ -92,8 +98,12 @@ export async function listR2ObjectsByPrefix(prefix: string): Promise<string[]> {
  * delete, acceptable at this scale.
  */
 export async function deleteR2Object(key: string): Promise<void> {
-  const res = await r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`, { method: 'DELETE' })
+  const res = await r2Client.fetch(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`, {
+    method: "DELETE",
+  });
   if (!res.ok && res.status !== 404) {
-    throw new Error(`deleteR2Object failed for ${key}: ${res.status} ${await res.text()}`)
+    throw new Error(
+      `deleteR2Object failed for ${key}: ${res.status} ${await res.text()}`,
+    );
   }
 }

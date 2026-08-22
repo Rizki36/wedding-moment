@@ -1,8 +1,8 @@
-import { createServerOnlyFn } from '@tanstack/react-start'
-import { downloadZip } from 'client-zip'
-import { getEvent } from './events'
-import { listSubmissionsForEvent } from './submissions'
-import { getR2Object } from '../storage/r2-client'
+import { createServerOnlyFn } from "@tanstack/react-start";
+import { downloadZip } from "client-zip";
+import { getR2Object } from "../storage/r2-client";
+import { getEvent } from "./events";
+import { listSubmissionsForEvent } from "./submissions";
 
 /**
  * Extracts the file extension (including the leading dot) from an object
@@ -11,8 +11,8 @@ import { getR2Object } from '../storage/r2-client'
  * `submissionAudioKey` always has one (see `keys.ts`).
  */
 function extname(key: string) {
-  const match = key.match(/\.[a-z0-9]+$/i)
-  return match ? match[0] : ''
+  const match = key.match(/\.[a-z0-9]+$/i);
+  return match ? match[0] : "";
 }
 
 /**
@@ -29,29 +29,40 @@ function extname(key: string) {
  * — the caller (the `/api/download/{eventId}.zip` route handler) must call
  * `requireEventOwner` first.
  */
-export const buildSubmissionsZipResponse = createServerOnlyFn(async (eventId: string) => {
-  const event = await getEvent(eventId)
-  if (!event) return null
+export const buildSubmissionsZipResponse = createServerOnlyFn(
+  async (eventId: string) => {
+    const event = await getEvent(eventId);
+    if (!event) return null;
 
-  const submissionList = await listSubmissionsForEvent(eventId)
+    const submissionList = await listSubmissionsForEvent(eventId);
 
-  async function* entries() {
-    for (const s of submissionList) {
-      const photoRes = await getR2Object(s.photoObjectKey)
-      if (photoRes.ok && photoRes.body) {
-        yield { name: `${s.guestName}-${s.id}/photo.jpg`, input: photoRes.body }
-      }
+    async function* entries() {
+      for (const s of submissionList) {
+        const photoRes = await getR2Object(s.photoObjectKey);
+        if (photoRes.ok && photoRes.body) {
+          yield {
+            name: `${s.guestName}-${s.id}/photo.jpg`,
+            input: photoRes.body,
+          };
+        }
 
-      if (s.audioObjectKey) {
-        const audioRes = await getR2Object(s.audioObjectKey)
-        if (audioRes.ok && audioRes.body) {
-          yield { name: `${s.guestName}-${s.id}/audio${extname(s.audioObjectKey)}`, input: audioRes.body }
+        if (s.audioObjectKey) {
+          const audioRes = await getR2Object(s.audioObjectKey);
+          if (audioRes.ok && audioRes.body) {
+            yield {
+              name: `${s.guestName}-${s.id}/audio${extname(s.audioObjectKey)}`,
+              input: audioRes.body,
+            };
+          }
         }
       }
     }
-  }
 
-  const response = downloadZip(entries())
-  response.headers.set('Content-Disposition', `attachment; filename="${event.slug}-moments.zip"`)
-  return response
-})
+    const response = downloadZip(entries());
+    response.headers.set(
+      "Content-Disposition",
+      `attachment; filename="${event.slug}-moments.zip"`,
+    );
+    return response;
+  },
+);

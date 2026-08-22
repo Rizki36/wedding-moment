@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { LinkButton } from '#/components/ui/Button'
-import { Badge } from '#/components/ui/Badge'
+import { createFileRoute } from "@tanstack/react-router";
+import { Badge } from "#/components/ui/Badge";
+import { LinkButton } from "#/components/ui/Button";
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
   return (
@@ -15,8 +15,8 @@ function Home() {
           di Setiap Momen
         </h1>
         <p className="text-(--color-on-surface-variant) max-w-md">
-          Ambil foto dan rekam ucapan untuk pengantin, langsung dari ponsel Anda — tanpa aplikasi, cukup pindai
-          kode QR.
+          Ambil foto dan rekam ucapan untuk pengantin, langsung dari ponsel Anda
+          — tanpa aplikasi, cukup pindai kode QR.
         </p>
         <div className="flex gap-4 flex-wrap justify-center mt-2">
           <LinkButton to="/login">Masuk</LinkButton>
@@ -26,7 +26,7 @@ function Home() {
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-export default Home
+export default Home;

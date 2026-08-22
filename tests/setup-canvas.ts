@@ -7,21 +7,24 @@
 //   - Blob sources are decoded through an <img> element, which jsdom backs
 //     with the `canvas` package's Image decoder and which ctx.drawImage()
 //     also recognizes.
-if (typeof globalThis.createImageBitmap === 'undefined') {
+if (typeof globalThis.createImageBitmap === "undefined") {
   globalThis.createImageBitmap = (async (
     source: HTMLCanvasElement | Blob,
   ): Promise<ImageBitmap> => {
     if (source instanceof Blob) {
-      const buffer = Buffer.from(await source.arrayBuffer())
-      const dataUrl = `data:${source.type};base64,${buffer.toString('base64')}`
-      const img = document.createElement('img')
+      const buffer = Buffer.from(await source.arrayBuffer());
+      const dataUrl = `data:${source.type};base64,${buffer.toString("base64")}`;
+      const img = document.createElement("img");
       await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve()
-        img.onerror = () => reject(new Error('createImageBitmap polyfill: failed to decode blob'))
-        img.src = dataUrl
-      })
-      return img as unknown as ImageBitmap
+        img.onload = () => resolve();
+        img.onerror = () =>
+          reject(
+            new Error("createImageBitmap polyfill: failed to decode blob"),
+          );
+        img.src = dataUrl;
+      });
+      return img as unknown as ImageBitmap;
     }
-    return source as unknown as ImageBitmap
-  }) as typeof createImageBitmap
+    return source as unknown as ImageBitmap;
+  }) as typeof createImageBitmap;
 }

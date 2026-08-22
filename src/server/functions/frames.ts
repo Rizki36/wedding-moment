@@ -1,8 +1,8 @@
-import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import { db } from '../db/client'
-import { frames } from '../db/schema'
-import { requireEventOwner } from '../auth/guards'
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
+import { requireEventOwner } from "../auth/guards";
+import { db } from "../db/client";
+import { frames } from "../db/schema";
 
 /**
  * Core DB logic, each wrapped in `createServerOnlyFn` — see `events.ts` for
@@ -10,18 +10,25 @@ import { requireEventOwner } from '../auth/guards'
  * `db` import pruned from the client bundle, even once every direct call
  * site is routed through the `*Fn` wrappers below).
  */
-export const createFrame = createServerOnlyFn(async (eventId: string, name: string, objectKey: string) => {
-  const [frame] = await db.insert(frames).values({ eventId, name, objectKey }).returning()
-  return frame
-})
+export const createFrame = createServerOnlyFn(
+  async (eventId: string, name: string, objectKey: string) => {
+    const [frame] = await db
+      .insert(frames)
+      .values({ eventId, name, objectKey })
+      .returning();
+    return frame;
+  },
+);
 
-export const listFramesForEvent = createServerOnlyFn(async (eventId: string) => {
-  return db.select().from(frames).where(eq(frames.eventId, eventId))
-})
+export const listFramesForEvent = createServerOnlyFn(
+  async (eventId: string) => {
+    return db.select().from(frames).where(eq(frames.eventId, eventId));
+  },
+);
 
 export const deleteFrame = createServerOnlyFn(async (frameId: string) => {
-  await db.delete(frames).where(eq(frames.id, frameId))
-})
+  await db.delete(frames).where(eq(frames.id, frameId));
+});
 
 /**
  * Client-safe entry points. These run through TanStack Start's server
@@ -42,19 +49,21 @@ export const deleteFrame = createServerOnlyFn(async (frameId: string) => {
  * hydration app-wide — see `events.ts`'s `getEventFn` for the same
  * rationale.
  */
-export const listFramesForEventFn = createServerFn({ method: 'GET' })
+export const listFramesForEventFn = createServerFn({ method: "GET" })
   .validator((eventId: string) => eventId)
   .handler(async ({ data: eventId }) => {
-    await requireEventOwner(eventId)
-    return listFramesForEvent(eventId)
-  })
+    await requireEventOwner(eventId);
+    return listFramesForEvent(eventId);
+  });
 
-export const createFrameFn = createServerFn({ method: 'POST' })
-  .validator((input: { eventId: string; name: string; objectKey: string }) => input)
+export const createFrameFn = createServerFn({ method: "POST" })
+  .validator(
+    (input: { eventId: string; name: string; objectKey: string }) => input,
+  )
   .handler(async ({ data }) => {
-    await requireEventOwner(data.eventId)
-    return createFrame(data.eventId, data.name, data.objectKey)
-  })
+    await requireEventOwner(data.eventId);
+    return createFrame(data.eventId, data.name, data.objectKey);
+  });
 
 /**
  * Only `frameId` is accepted from the client — NOT a client-supplied
@@ -64,11 +73,14 @@ export const createFrameFn = createServerFn({ method: 'POST' })
  * `frameId`. Instead the frame's real `eventId` is looked up server-side
  * first, and that value is what gets checked against the caller's session.
  */
-export const deleteFrameFn = createServerFn({ method: 'POST' })
+export const deleteFrameFn = createServerFn({ method: "POST" })
   .validator((input: { frameId: string }) => input)
   .handler(async ({ data }) => {
-    const [frame] = await db.select().from(frames).where(eq(frames.id, data.frameId))
-    if (!frame) return
-    await requireEventOwner(frame.eventId)
-    await deleteFrame(data.frameId)
-  })
+    const [frame] = await db
+      .select()
+      .from(frames)
+      .where(eq(frames.id, data.frameId));
+    if (!frame) return;
+    await requireEventOwner(frame.eventId);
+    await deleteFrame(data.frameId);
+  });

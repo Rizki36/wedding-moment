@@ -1,10 +1,10 @@
-import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { desc, eq } from 'drizzle-orm'
-import { db } from '../db/client'
-import { events, submissions } from '../db/schema'
-import { createSubmissionSchema } from '../../lib/validators'
-import { requireEventOwner } from '../auth/guards'
-import { getPresignedGetUrl } from '../storage/presign'
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { desc, eq } from "drizzle-orm";
+import { createSubmissionSchema } from "../../lib/validators";
+import { requireEventOwner } from "../auth/guards";
+import { db } from "../db/client";
+import { events, submissions } from "../db/schema";
+import { getPresignedGetUrl } from "../storage/presign";
 
 /**
  * Core DB logic, wrapped in `createServerOnlyFn` — see `events.ts`/
@@ -20,16 +20,19 @@ import { getPresignedGetUrl } from '../storage/presign'
  * functions.
  */
 export const createSubmission = createServerOnlyFn(async (input: unknown) => {
-  const parsed = createSubmissionSchema.parse(input)
+  const parsed = createSubmissionSchema.parse(input);
 
-  const [event] = await db.select().from(events).where(eq(events.id, parsed.eventId))
-  if (!event || event.status !== 'active') {
-    throw new Error('Event is not accepting submissions')
+  const [event] = await db
+    .select()
+    .from(events)
+    .where(eq(events.id, parsed.eventId));
+  if (!event || event.status !== "active") {
+    throw new Error("Event is not accepting submissions");
   }
 
-  const [submission] = await db.insert(submissions).values(parsed).returning()
-  return submission
-})
+  const [submission] = await db.insert(submissions).values(parsed).returning();
+  return submission;
+});
 
 /**
  * Lists all submissions for an event, newest first. Ownership is NOT
@@ -39,9 +42,15 @@ export const createSubmission = createServerOnlyFn(async (input: unknown) => {
  * `requireEventOwner` first), matching how `getEvent`/`listFramesForEvent`
  * defer authorization to their callers rather than duplicating it.
  */
-export const listSubmissionsForEvent = createServerOnlyFn(async (eventId: string) => {
-  return db.select().from(submissions).where(eq(submissions.eventId, eventId)).orderBy(desc(submissions.createdAt))
-})
+export const listSubmissionsForEvent = createServerOnlyFn(
+  async (eventId: string) => {
+    return db
+      .select()
+      .from(submissions)
+      .where(eq(submissions.eventId, eventId))
+      .orderBy(desc(submissions.createdAt));
+  },
+);
 
 /**
  * Client-safe entry point for `events.$eventId/submissions.tsx`'s route
@@ -58,20 +67,22 @@ export const listSubmissionsForEvent = createServerOnlyFn(async (eventId: string
  * frame thumbnail URLs — the R2 bucket is private, so a bare object key
  * cannot be used as an `<img>`/`<audio>` `src` on the client.
  */
-export const listSubmissionsForEventFn = createServerFn({ method: 'GET' })
+export const listSubmissionsForEventFn = createServerFn({ method: "GET" })
   .validator((eventId: string) => eventId)
   .handler(async ({ data: eventId }) => {
-    await requireEventOwner(eventId)
-    const rows = await listSubmissionsForEvent(eventId)
+    await requireEventOwner(eventId);
+    const rows = await listSubmissionsForEvent(eventId);
     return Promise.all(
       rows.map(async (s) => ({
         id: s.id,
         guestName: s.guestName,
         photoUrl: await getPresignedGetUrl(s.photoObjectKey),
-        audioUrl: s.audioObjectKey ? await getPresignedGetUrl(s.audioObjectKey) : null,
+        audioUrl: s.audioObjectKey
+          ? await getPresignedGetUrl(s.audioObjectKey)
+          : null,
       })),
-    )
-  })
+    );
+  });
 
 /**
  * Client-safe entry point. This is a network-reachable RPC endpoint,
@@ -82,6 +93,6 @@ export const listSubmissionsForEventFn = createServerFn({ method: 'GET' })
  * and `createSubmission` itself re-verifies the target event is `active`
  * before writing anything.
  */
-export const createSubmissionFn = createServerFn({ method: 'POST' })
+export const createSubmissionFn = createServerFn({ method: "POST" })
   .validator((input: unknown) => input)
-  .handler(async ({ data }) => createSubmission(data))
+  .handler(async ({ data }) => createSubmission(data));

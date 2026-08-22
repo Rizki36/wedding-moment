@@ -1,17 +1,29 @@
-import 'dotenv/config'
-import { describe, it, expect } from 'vitest'
-import { createFrame, listFramesForEvent } from '../src/server/functions/frames'
-import { createEvent } from '../src/server/functions/events'
-import { requireEventOwner } from '../src/server/auth/guards'
+import "dotenv/config";
+import { describe, expect, it } from "vitest";
+import { requireEventOwner } from "../src/server/auth/guards";
+import { createEvent } from "../src/server/functions/events";
+import {
+  createFrame,
+  listFramesForEvent,
+} from "../src/server/functions/frames";
 
-describe('frames', () => {
-  it('creates a frame linked to an event and lists it', async () => {
-    const event = await createEvent({ ownerId: 'test-owner', brideName: 'A', groomName: 'B', eventDate: '2026-09-01' })
-    const frame = await createFrame(event.id, 'Frame Emas', `events/${event.id}/frames/test.png`)
-    const list = await listFramesForEvent(event.id)
-    expect(list.map((f) => f.id)).toContain(frame.id)
-  })
-})
+describe("frames", () => {
+  it("creates a frame linked to an event and lists it", async () => {
+    const event = await createEvent({
+      ownerId: "test-owner",
+      brideName: "A",
+      groomName: "B",
+      eventDate: "2026-09-01",
+    });
+    const frame = await createFrame(
+      event.id,
+      "Frame Emas",
+      `events/${event.id}/frames/test.png`,
+    );
+    const list = await listFramesForEvent(event.id);
+    expect(list.map((f) => f.id)).toContain(frame.id);
+  });
+});
 
 /**
  * `createFrameFn`/`deleteFrameFn` (src/server/functions/frames.ts) and the
@@ -23,14 +35,16 @@ describe('frames', () => {
  * actual security boundary they all share: `requireEventOwner` rejecting an
  * unauthenticated caller for an arbitrary event.
  */
-describe('frame mutation security: ownership required', () => {
-  it('requireEventOwner rejects a request with no session', async () => {
+describe("frame mutation security: ownership required", () => {
+  it("requireEventOwner rejects a request with no session", async () => {
     const event = await createEvent({
-      ownerId: 'test-owner-2',
-      brideName: 'C',
-      groomName: 'D',
-      eventDate: '2026-10-01',
-    })
-    await expect(requireEventOwner(event.id, new Headers())).rejects.toBeDefined()
-  })
-})
+      ownerId: "test-owner-2",
+      brideName: "C",
+      groomName: "D",
+      eventDate: "2026-10-01",
+    });
+    await expect(
+      requireEventOwner(event.id, new Headers()),
+    ).rejects.toBeDefined();
+  });
+});

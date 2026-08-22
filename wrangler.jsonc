@@ -2,7 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wedding-moment",
   "compatibility_date": "2025-09-02",
-  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
+  ],
   "main": "@tanstack/react-start/server-entry",
   // Declares intent to run the retention-purge job daily at 02:00 UTC. No
   // native Cloudflare Worker `scheduled` handler is wired up yet to act on

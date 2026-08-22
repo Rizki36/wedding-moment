@@ -2,7 +2,10 @@
   "rules": [
     {
       "allowed": {
-        "origins": ["http://localhost:3000", "https://wedding-moment.*.workers.dev"],
+        "origins": [
+          "http://localhost:3000",
+          "https://wedding-moment.*.workers.dev"
+        ],
         "methods": ["PUT", "GET"],
         "headers": ["Content-Type"]
       },

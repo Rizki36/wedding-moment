@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import QRCode from 'qrcode'
-import { getEvent } from '../../server/functions/events'
+import { createFileRoute } from "@tanstack/react-router";
+import QRCode from "qrcode";
+import { getEvent } from "../../server/functions/events";
 
 /**
  * On-demand QR code generation. Public/unauthenticated by design (matches
@@ -10,26 +10,39 @@ import { getEvent } from '../../server/functions/events'
  * returned here, so (unlike `uploads.presign.ts`) no `requireEventOwner`/
  * `requireAdmin` check is needed inside the handler.
  */
-export const Route = createFileRoute('/api/qr/{$eventId}.png')({
+export const Route = createFileRoute("/api/qr/{$eventId}.png")({
   server: {
     handlers: {
-      GET: async ({ params, request }: { params: { eventId: string }; request: Request }) => {
-        const event = await getEvent(params.eventId)
-        if (!event) return new Response('Not found', { status: 404 })
+      GET: async ({
+        params,
+        request,
+      }: {
+        params: { eventId: string };
+        request: Request;
+      }) => {
+        const event = await getEvent(params.eventId);
+        if (!event) return new Response("Not found", { status: 404 });
 
-        const url = new URL(request.url)
-        const eventUrl = `${url.protocol}//${url.host}/e/${event.slug}`
-        const buffer = await QRCode.toBuffer(eventUrl, { type: 'png', width: 512 })
+        const url = new URL(request.url);
+        const eventUrl = `${url.protocol}//${url.host}/e/${event.slug}`;
+        const buffer = await QRCode.toBuffer(eventUrl, {
+          type: "png",
+          width: 512,
+        });
 
-        const download = url.searchParams.get('download')
+        const download = url.searchParams.get("download");
         const headers = new Headers({
-          'Content-Type': 'image/png',
-          'Cache-Control': 'public, max-age=31536000, immutable',
-        })
-        if (download) headers.set('Content-Disposition', `attachment; filename="qr-${event.slug}.png"`)
+          "Content-Type": "image/png",
+          "Cache-Control": "public, max-age=31536000, immutable",
+        });
+        if (download)
+          headers.set(
+            "Content-Disposition",
+            `attachment; filename="qr-${event.slug}.png"`,
+          );
 
-        return new Response(new Uint8Array(buffer), { headers })
+        return new Response(new Uint8Array(buffer), { headers });
       },
     },
   },
-})
+});

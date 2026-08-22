@@ -1,5 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { findEventsPastRetention, purgeEvent } from '../../server/functions/purge'
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  findEventsPastRetention,
+  purgeEvent,
+} from "../../server/functions/purge";
 
 /**
  * Retention-purge cron endpoint. Deletes every event whose 30-day retention
@@ -19,22 +22,22 @@ import { findEventsPastRetention, purgeEvent } from '../../server/functions/purg
  * be invoked manually or by an external scheduler (e.g. a GitHub Actions
  * scheduled workflow) with the `x-cron-secret` header set to `CRON_SECRET`.
  */
-export const Route = createFileRoute('/api/cron/purge')({
+export const Route = createFileRoute("/api/cron/purge")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const secret = request.headers.get('x-cron-secret')
+        const secret = request.headers.get("x-cron-secret");
         if (!secret || secret !== process.env.CRON_SECRET) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const dueEvents = await findEventsPastRetention()
+        const dueEvents = await findEventsPastRetention();
         for (const event of dueEvents) {
-          await purgeEvent(event.id)
+          await purgeEvent(event.id);
         }
 
-        return Response.json({ purgedCount: dueEvents.length })
+        return Response.json({ purgedCount: dueEvents.length });
       },
     },
   },
-})
+});

@@ -1,12 +1,27 @@
-import { Card } from '../ui/Card'
-import { primaryButtonVariantClasses } from '../ui/Button'
+import { primaryButtonVariantClasses } from "../ui/Button";
+import { Card } from "../ui/Card";
 
-export function QrCodeCard({ eventId, slug }: { eventId: string; slug: string }) {
-  const eventUrl = typeof window !== 'undefined' ? `${window.location.origin}/e/${slug}` : `/e/${slug}`
+export function QrCodeCard({
+  eventId,
+  slug,
+}: {
+  eventId: string;
+  slug: string;
+}) {
+  const eventUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/e/${slug}`
+      : `/e/${slug}`;
   return (
     <Card className="flex flex-col items-center gap-2 p-4">
-      <img src={`/api/qr/${eventId}.png`} alt="QR Code Acara" className="w-48 h-48" />
-      <p className="text-sm text-(--color-on-surface-variant) break-all">{eventUrl}</p>
+      <img
+        src={`/api/qr/${eventId}.png`}
+        alt="QR Code Acara"
+        className="w-48 h-48"
+      />
+      <p className="text-sm text-(--color-on-surface-variant) break-all">
+        {eventUrl}
+      </p>
       {/* Plain `<a>`, not `LinkButton` — points at an API-served file, not a router route. */}
       <a
         href={`/api/qr/${eventId}.png?download=1`}
@@ -15,5 +30,5 @@ export function QrCodeCard({ eventId, slug }: { eventId: string; slug: string })
         Unduh QR Code
       </a>
     </Card>
-  )
+  );
 }

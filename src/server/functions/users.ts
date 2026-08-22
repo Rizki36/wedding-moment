@@ -1,12 +1,16 @@
-import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import { auth } from '../auth/auth'
-import { requireAdmin } from '../auth/guards'
-import { toPlaceholderEmail } from '../auth/placeholder-email'
-import { db } from '../db/client'
-import { user } from '../db/schema'
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
+import { auth } from "../auth/auth";
+import { requireAdmin } from "../auth/guards";
+import { toPlaceholderEmail } from "../auth/placeholder-email";
+import { db } from "../db/client";
+import { user } from "../db/schema";
 
-export type CreatePengantinInput = { name: string; username: string; password: string }
+export type CreatePengantinInput = {
+  name: string;
+  username: string;
+  password: string;
+};
 
 /**
  * Core logic, each wrapped in `createServerOnlyFn` (matching `guards.ts`'s
@@ -25,22 +29,24 @@ export type CreatePengantinInput = { name: string; username: string; password: s
  * kept `auth`/`db` alive in the client bundle even after every call site
  * was routed through the `*Fn` wrappers below.
  */
-export const createPengantinAccount = createServerOnlyFn(async (input: CreatePengantinInput) => {
-  const result = await auth.api.signUpEmail({
-    body: {
-      name: input.name,
-      email: toPlaceholderEmail(input.username),
-      username: input.username,
-      displayUsername: input.username,
-      password: input.password,
-    },
-  })
-  return result.user
-})
+export const createPengantinAccount = createServerOnlyFn(
+  async (input: CreatePengantinInput) => {
+    const result = await auth.api.signUpEmail({
+      body: {
+        name: input.name,
+        email: toPlaceholderEmail(input.username),
+        username: input.username,
+        displayUsername: input.username,
+        password: input.password,
+      },
+    });
+    return result.user;
+  },
+);
 
 export const listPengantin = createServerOnlyFn(async () => {
-  return db.select().from(user).where(eq(user.role, 'pengantin'))
-})
+  return db.select().from(user).where(eq(user.role, "pengantin"));
+});
 
 /**
  * Client-safe entry point for `admin/index.tsx`'s route `loader`. Loaders
@@ -54,10 +60,12 @@ export const listPengantin = createServerOnlyFn(async () => {
  * with a client RPC stub and prunes the now-unreachable `db`/`auth`
  * imports from the client build.
  */
-export const listPengantinFn = createServerFn({ method: 'GET' }).handler(async () => {
-  await requireAdmin()
-  return listPengantin()
-})
+export const listPengantinFn = createServerFn({ method: "GET" }).handler(
+  async () => {
+    await requireAdmin();
+    return listPengantin();
+  },
+);
 
 /**
  * Client-safe entry point used by the "Buat Akun Pengantin" form
@@ -71,9 +79,9 @@ export const listPengantinFn = createServerFn({ method: 'GET' }).handler(async (
  * `getRequestHeaders()` call — and no import of
  * '@tanstack/react-start/server' — is needed in this file.
  */
-export const createPengantinAccountFn = createServerFn({ method: 'POST' })
+export const createPengantinAccountFn = createServerFn({ method: "POST" })
   .validator((input: CreatePengantinInput) => input)
   .handler(async ({ data }) => {
-    await requireAdmin()
-    return createPengantinAccount(data)
-  })
+    await requireAdmin();
+    return createPengantinAccount(data);
+  });

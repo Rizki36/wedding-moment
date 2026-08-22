@@ -1,8 +1,8 @@
-import { and, eq, isNull, lt } from 'drizzle-orm'
-import { db } from '../db/client'
-import { events, frames, submissions } from '../db/schema'
-import { deleteR2Object, listR2ObjectsByPrefix } from '../storage/r2-client'
-import { eventPrefix } from '../storage/keys'
+import { and, eq, isNull, lt } from "drizzle-orm";
+import { db } from "../db/client";
+import { events, frames, submissions } from "../db/schema";
+import { eventPrefix } from "../storage/keys";
+import { deleteR2Object, listR2ObjectsByPrefix } from "../storage/r2-client";
 
 /**
  * Plain server-only functions — NOT wrapped in `createServerFn`/
@@ -20,7 +20,9 @@ export async function findEventsPastRetention() {
   return db
     .select()
     .from(events)
-    .where(and(lt(events.retentionDeadline, new Date()), isNull(events.purgedAt)))
+    .where(
+      and(lt(events.retentionDeadline, new Date()), isNull(events.purgedAt)),
+    );
 }
 
 /** Deletes every object under `prefix`, with limited concurrency so a large
@@ -28,11 +30,11 @@ export async function findEventsPastRetention() {
  * See `r2-client.ts`'s `deleteR2Object` doc comment for why this issues
  * individual DELETEs rather than R2's bulk multi-delete endpoint. */
 async function deleteR2Prefix(prefix: string, concurrency = 10): Promise<void> {
-  const keys = await listR2ObjectsByPrefix(prefix)
+  const keys = await listR2ObjectsByPrefix(prefix);
 
   for (let i = 0; i < keys.length; i += concurrency) {
-    const batch = keys.slice(i, i + concurrency)
-    await Promise.all(batch.map((key) => deleteR2Object(key)))
+    const batch = keys.slice(i, i + concurrency);
+    await Promise.all(batch.map((key) => deleteR2Object(key)));
   }
 }
 
@@ -65,16 +67,16 @@ async function deleteR2Prefix(prefix: string, concurrency = 10): Promise<void> {
  * leaving a dangling reference even momentarily).
  */
 export async function purgeEvent(eventId: string): Promise<void> {
-  const [event] = await db.select().from(events).where(eq(events.id, eventId))
-  if (!event || event.purgedAt) return
+  const [event] = await db.select().from(events).where(eq(events.id, eventId));
+  if (!event || event.purgedAt) return;
 
-  await deleteR2Prefix(eventPrefix(eventId))
+  await deleteR2Prefix(eventPrefix(eventId));
 
-  await db.delete(submissions).where(eq(submissions.eventId, eventId))
-  await db.delete(frames).where(eq(frames.eventId, eventId))
+  await db.delete(submissions).where(eq(submissions.eventId, eventId));
+  await db.delete(frames).where(eq(frames.eventId, eventId));
 
   await db
     .update(events)
-    .set({ status: 'purged', purgedAt: new Date() })
-    .where(eq(events.id, eventId))
+    .set({ status: "purged", purgedAt: new Date() })
+    .where(eq(events.id, eventId));
 }

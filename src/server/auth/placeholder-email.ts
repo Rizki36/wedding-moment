@@ -1,4 +1,4 @@
-const PLACEHOLDER_EMAIL_DOMAIN = 'wedding-moment.internal'
+const PLACEHOLDER_EMAIL_DOMAIN = "wedding-moment.internal";
 
 /**
  * Better Auth's core signup contract requires an email even with the
@@ -7,5 +7,5 @@ const PLACEHOLDER_EMAIL_DOMAIN = 'wedding-moment.internal'
  * (enforced by the DB column).
  */
 export function toPlaceholderEmail(username: string): string {
-  return `${username.toLowerCase()}@${PLACEHOLDER_EMAIL_DOMAIN}`
+  return `${username.toLowerCase()}@${PLACEHOLDER_EMAIL_DOMAIN}`;
 }

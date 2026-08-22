@@ -1,4 +1,4 @@
-import { r2Client, R2_ENDPOINT, R2_BUCKET_NAME } from './r2-client'
+import { R2_BUCKET_NAME, R2_ENDPOINT, r2Client } from "./r2-client";
 
 /**
  * Returns a short-lived (5 minute) presigned URL the client can PUT the
@@ -8,16 +8,22 @@ import { r2Client, R2_ENDPOINT, R2_BUCKET_NAME } from './r2-client'
  * `/api/uploads/presign` route handler) must verify the caller is allowed to
  * write to `key` before calling this.
  */
-export async function getPresignedUploadUrl(key: string, contentType: string): Promise<string> {
-  const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`)
-  url.searchParams.set('X-Amz-Expires', '300')
+export async function getPresignedUploadUrl(
+  key: string,
+  contentType: string,
+): Promise<string> {
+  const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`);
+  url.searchParams.set("X-Amz-Expires", "300");
 
   const signed = await r2Client.sign(
-    new Request(url, { method: 'PUT', headers: { 'Content-Type': contentType } }),
+    new Request(url, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+    }),
     { aws: { signQuery: true } },
-  )
+  );
 
-  return signed.url
+  return signed.url;
 }
 
 /**
@@ -33,12 +39,12 @@ export async function getPresignedUploadUrl(key: string, contentType: string): P
  * `key` before calling this.
  */
 export async function getPresignedGetUrl(key: string): Promise<string> {
-  const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`)
-  url.searchParams.set('X-Amz-Expires', '3600')
+  const url = new URL(`${R2_ENDPOINT}/${R2_BUCKET_NAME}/${key}`);
+  url.searchParams.set("X-Amz-Expires", "3600");
 
-  const signed = await r2Client.sign(new Request(url, { method: 'GET' }), {
+  const signed = await r2Client.sign(new Request(url, { method: "GET" }), {
     aws: { signQuery: true },
-  })
+  });
 
-  return signed.url
+  return signed.url;
 }

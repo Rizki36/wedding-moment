@@ -1,4 +1,4 @@
-import { primaryButtonVariantClasses } from '../ui/Button'
+import { primaryButtonVariantClasses } from "../ui/Button";
 
 // Plain `<a>`, not `LinkButton` — this points at an API-served file
 // (`/api/download/*.zip`), not a TanStack Router route, so it can't use
@@ -11,5 +11,5 @@ export function BulkDownloadButton({ eventId }: { eventId: string }) {
     >
       Unduh Semua
     </a>
-  )
+  );
 }

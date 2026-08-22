@@ -1,33 +1,42 @@
-import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
-import { db } from '../db/client'
-import { events } from '../db/schema'
-import { requireAdmin, requireEventOwner, requirePengantin } from '../auth/guards'
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
+import {
+  requireAdmin,
+  requireEventOwner,
+  requirePengantin,
+} from "../auth/guards";
+import { db } from "../db/client";
+import { events } from "../db/schema";
 
 export type CreateEventInput = {
-  ownerId: string
-  brideName: string
-  groomName: string
-  eventDate: string
-  venue?: string
-}
+  ownerId: string;
+  brideName: string;
+  groomName: string;
+  eventDate: string;
+  venue?: string;
+};
 
-export type UpdateEventInput = Partial<Omit<CreateEventInput, 'ownerId'>>
+export type UpdateEventInput = Partial<Omit<CreateEventInput, "ownerId">>;
 
 /** Fields a caller is allowed to change through `updateEventFn`. Deliberately
  * excludes `ownerId`, `id`, `slug`, `status`, `retentionDeadline`, `purgedAt`,
  * and timestamps — those are never client-editable. */
-const EDITABLE_UPDATE_FIELDS = ['brideName', 'groomName', 'eventDate', 'venue'] as const
+const EDITABLE_UPDATE_FIELDS = [
+  "brideName",
+  "groomName",
+  "eventDate",
+  "venue",
+] as const;
 
 function pickEditableFields(input: Record<string, unknown>): UpdateEventInput {
-  const result: UpdateEventInput = {}
+  const result: UpdateEventInput = {};
   for (const key of EDITABLE_UPDATE_FIELDS) {
     if (key in input) {
-      ;(result as Record<string, unknown>)[key] = input[key]
+      (result as Record<string, unknown>)[key] = input[key];
     }
   }
-  return result
+  return result;
 }
 
 /**
@@ -43,45 +52,55 @@ function pickEditableFields(input: Record<string, unknown>): UpdateEventInput {
  * leaving these unwrapped kept `db` alive in the client bundle even once
  * every direct call site was routed through the `*Fn` wrappers below.
  */
-export const createEvent = createServerOnlyFn(async (input: CreateEventInput) => {
-  const slug = nanoid(10)
-  const eventDate = new Date(input.eventDate)
-  const retentionDeadline = new Date(eventDate.getTime() + 30 * 24 * 60 * 60 * 1000)
+export const createEvent = createServerOnlyFn(
+  async (input: CreateEventInput) => {
+    const slug = nanoid(10);
+    const eventDate = new Date(input.eventDate);
+    const retentionDeadline = new Date(
+      eventDate.getTime() + 30 * 24 * 60 * 60 * 1000,
+    );
 
-  const [event] = await db
-    .insert(events)
-    .values({
-      slug,
-      ownerId: input.ownerId,
-      brideName: input.brideName,
-      groomName: input.groomName,
-      eventDate: input.eventDate,
-      venue: input.venue,
-      retentionDeadline,
-    })
-    .returning()
+    const [event] = await db
+      .insert(events)
+      .values({
+        slug,
+        ownerId: input.ownerId,
+        brideName: input.brideName,
+        groomName: input.groomName,
+        eventDate: input.eventDate,
+        venue: input.venue,
+        retentionDeadline,
+      })
+      .returning();
 
-  return event
-})
+    return event;
+  },
+);
 
 export const getEvent = createServerOnlyFn(async (eventId: string) => {
-  const [event] = await db.select().from(events).where(eq(events.id, eventId))
-  return event ?? null
-})
+  const [event] = await db.select().from(events).where(eq(events.id, eventId));
+  return event ?? null;
+});
 
 export const getEventBySlug = createServerOnlyFn(async (slug: string) => {
-  const [event] = await db.select().from(events).where(eq(events.slug, slug))
-  return event ?? null
-})
+  const [event] = await db.select().from(events).where(eq(events.slug, slug));
+  return event ?? null;
+});
 
 export const listMyEvents = createServerOnlyFn(async (ownerId: string) => {
-  return db.select().from(events).where(eq(events.ownerId, ownerId))
-})
+  return db.select().from(events).where(eq(events.ownerId, ownerId));
+});
 
-export const updateEvent = createServerOnlyFn(async (eventId: string, input: UpdateEventInput) => {
-  const [event] = await db.update(events).set(input).where(eq(events.id, eventId)).returning()
-  return event
-})
+export const updateEvent = createServerOnlyFn(
+  async (eventId: string, input: UpdateEventInput) => {
+    const [event] = await db
+      .update(events)
+      .set(input)
+      .where(eq(events.id, eventId))
+      .returning();
+    return event;
+  },
+);
 
 /**
  * Client-safe entry points. These run through TanStack Start's server
@@ -98,27 +117,27 @@ export const updateEvent = createServerOnlyFn(async (eventId: string, input: Upd
  * `getRequestHeaders()` call — and no import of
  * '@tanstack/react-start/server' — is needed in this file.
  */
-export type CreateEventFormInput = Omit<CreateEventInput, 'ownerId'>
+export type CreateEventFormInput = Omit<CreateEventInput, "ownerId">;
 
-export const createEventFn = createServerFn({ method: 'POST' })
+export const createEventFn = createServerFn({ method: "POST" })
   .validator((input: CreateEventFormInput) => input)
   .handler(async ({ data }) => {
     // Never trust a client-supplied ownerId — derive it from the verified
     // session so a caller cannot create events on behalf of another user.
-    const session = await requirePengantin()
-    return createEvent({ ...data, ownerId: session.user.id })
-  })
+    const session = await requirePengantin();
+    return createEvent({ ...data, ownerId: session.user.id });
+  });
 
-export const updateEventFn = createServerFn({ method: 'POST' })
+export const updateEventFn = createServerFn({ method: "POST" })
   .validator((input: { eventId: string } & Record<string, unknown>) => input)
   .handler(async ({ data }) => {
-    const { eventId, ...rest } = data
+    const { eventId, ...rest } = data;
     // Only the owning pengantin (or an admin) may update this event.
-    await requireEventOwner(eventId)
+    await requireEventOwner(eventId);
     // Restrict to the whitelisted editable fields — never let ownerId, id,
     // slug, status, retentionDeadline, purgedAt, or timestamps through.
-    return updateEvent(eventId, pickEditableFields(rest))
-  })
+    return updateEvent(eventId, pickEditableFields(rest));
+  });
 
 /**
  * Client-safe entry points for route `loader`s. Loaders run on both server
@@ -131,35 +150,37 @@ export const updateEventFn = createServerFn({ method: 'POST' })
  * `createEventFn`/`updateEventFn` rationale above, since these become
  * network-reachable independent of any route's `beforeLoad`.
  */
-export const getEventFn = createServerFn({ method: 'GET' })
+export const getEventFn = createServerFn({ method: "GET" })
   .validator((eventId: string) => eventId)
   .handler(async ({ data: eventId }) => {
     // `requireEventOwner` allows admins through, so this single endpoint
     // serves both the pengantin dashboard and the admin QR page.
-    await requireEventOwner(eventId)
-    return getEvent(eventId)
-  })
+    await requireEventOwner(eventId);
+    return getEvent(eventId);
+  });
 
-export const listMyEventsFn = createServerFn({ method: 'GET' }).handler(async () => {
-  // Ownership is derived from the verified session, not a client-supplied
-  // id, so a caller can only ever list their own events here.
-  const session = await requirePengantin()
-  return listMyEvents(session.user.id)
-})
+export const listMyEventsFn = createServerFn({ method: "GET" }).handler(
+  async () => {
+    // Ownership is derived from the verified session, not a client-supplied
+    // id, so a caller can only ever list their own events here.
+    const session = await requirePengantin();
+    return listMyEvents(session.user.id);
+  },
+);
 
 /** Admin-only: list events for an arbitrary pengantin (`admin/pengantin.$id.tsx`). */
-export const listEventsForOwnerFn = createServerFn({ method: 'GET' })
+export const listEventsForOwnerFn = createServerFn({ method: "GET" })
   .validator((ownerId: string) => ownerId)
   .handler(async ({ data: ownerId }) => {
-    await requireAdmin()
-    return listMyEvents(ownerId)
-  })
+    await requireAdmin();
+    return listMyEvents(ownerId);
+  });
 
 /** Admin-only: create an event owned by an arbitrary pengantin (`admin/pengantin.$id.events.new.tsx`). */
-export const createEventForOwnerFn = createServerFn({ method: 'POST' })
+export const createEventForOwnerFn = createServerFn({ method: "POST" })
   .validator((input: { ownerId: string } & CreateEventFormInput) => input)
   .handler(async ({ data }) => {
-    await requireAdmin()
-    const { ownerId, ...rest } = data
-    return createEvent({ ...rest, ownerId })
-  })
+    await requireAdmin();
+    const { ownerId, ...rest } = data;
+    return createEvent({ ...rest, ownerId });
+  });

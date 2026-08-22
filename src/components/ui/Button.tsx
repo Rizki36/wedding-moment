@@ -1,44 +1,56 @@
-import { Link, type LinkProps } from '@tanstack/react-router'
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { Link, type LinkProps } from "@tanstack/react-router";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export type ButtonVariant = 'primary' | 'outline'
+export type ButtonVariant = "primary" | "outline";
 
-const base = 'inline-flex items-center justify-center gap-2 rounded px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed'
+const base =
+  "inline-flex items-center justify-center gap-2 rounded px-6 py-3 font-medium text-center transition disabled:opacity-50 disabled:cursor-not-allowed";
 
 /** Primary button color, border, and hover styles (for composing custom button-like elements) */
-export const primaryButtonVariantClasses = 'bg-(--color-primary) text-(--color-on-primary) border border-transparent hover:border-(--color-primary-container)'
+export const primaryButtonVariantClasses =
+  "bg-(--color-primary) text-(--color-on-primary) border border-transparent hover:border-(--color-primary-container)";
 
 function variantClasses(variant: ButtonVariant) {
-  return variant === 'primary'
+  return variant === "primary"
     ? `${base} ${primaryButtonVariantClasses}`
-    : `${base} border border-(--color-primary) text-(--color-primary) hover:bg-(--color-primary-container)/40`
+    : `${base} border border-(--color-primary) text-(--color-primary) hover:bg-(--color-primary-container)/40`;
 }
 
 type ButtonProps = {
-  variant?: ButtonVariant
-  children: ReactNode
-} & ButtonHTMLAttributes<HTMLButtonElement>
+  variant?: ButtonVariant;
+  children: ReactNode;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 /** Plain `<button>` primitive — use for form submits and in-page actions. */
-export function Button({ variant = 'primary', children, className = '', ...rest }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  children,
+  className = "",
+  ...rest
+}: ButtonProps) {
   return (
     <button className={`${variantClasses(variant)} ${className}`} {...rest}>
       {children}
     </button>
-  )
+  );
 }
 
 type LinkButtonProps = {
-  variant?: ButtonVariant
-  children: ReactNode
-  className?: string
-} & LinkProps
+  variant?: ButtonVariant;
+  children: ReactNode;
+  className?: string;
+} & LinkProps;
 
 /** `@tanstack/react-router` `Link`-based primitive — use for navigation. */
-export function LinkButton({ variant = 'primary', children, className = '', ...rest }: LinkButtonProps) {
+export function LinkButton({
+  variant = "primary",
+  children,
+  className = "",
+  ...rest
+}: LinkButtonProps) {
   return (
     <Link className={`${variantClasses(variant)} ${className}`} {...rest}>
       {children}
     </Link>
-  )
+  );
 }

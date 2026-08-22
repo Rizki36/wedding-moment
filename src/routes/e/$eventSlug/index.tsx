@@ -1,18 +1,18 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { useState } from 'react'
-import { nanoid } from 'nanoid'
-import { getEventBySlug } from '../../../server/functions/events'
-import { listFramesForEvent } from '../../../server/functions/frames'
-import { getPresignedGetUrl } from '../../../server/storage/presign'
-import { createSubmissionFn } from '../../../server/functions/submissions'
-import { GuestNameForm } from '../../../components/capture/GuestNameForm'
-import { FramePicker } from '../../../components/capture/FramePicker'
-import { CameraCapture } from '../../../components/capture/CameraCapture'
-import { AudioRecorder } from '../../../components/capture/AudioRecorder'
-import { CapturePreview } from '../../../components/capture/CapturePreview'
-import { compositePhotoWithFrame } from '../../../components/capture/FrameOverlayCanvas'
-import { extensionForMimeType } from '../../../lib/audio-mime'
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { nanoid } from "nanoid";
+import { useState } from "react";
+import { AudioRecorder } from "../../../components/capture/AudioRecorder";
+import { CameraCapture } from "../../../components/capture/CameraCapture";
+import { CapturePreview } from "../../../components/capture/CapturePreview";
+import { compositePhotoWithFrame } from "../../../components/capture/FrameOverlayCanvas";
+import { FramePicker } from "../../../components/capture/FramePicker";
+import { GuestNameForm } from "../../../components/capture/GuestNameForm";
+import { extensionForMimeType } from "../../../lib/audio-mime";
+import { getEventBySlug } from "../../../server/functions/events";
+import { listFramesForEvent } from "../../../server/functions/frames";
+import { createSubmissionFn } from "../../../server/functions/submissions";
+import { getPresignedGetUrl } from "../../../server/storage/presign";
 
 /**
  * Fully public/unauthenticated route — guests never log in, so this route
@@ -26,69 +26,75 @@ import { extensionForMimeType } from '../../../lib/audio-mime'
  * hydration app-wide. Routing it through `createServerFn` keeps the DB/R2
  * imports server-only.
  */
-const getGuestLandingDataFn = createServerFn({ method: 'GET' })
+const getGuestLandingDataFn = createServerFn({ method: "GET" })
   .validator((eventSlug: string) => eventSlug)
   .handler(async ({ data: eventSlug }) => {
-    const event = await getEventBySlug(eventSlug)
-    if (!event || event.status !== 'active') return { event: null, frames: [] }
-    const frames = await listFramesForEvent(event.id)
+    const event = await getEventBySlug(eventSlug);
+    if (!event || event.status !== "active") return { event: null, frames: [] };
+    const frames = await listFramesForEvent(event.id);
     // `objectKey` is overwritten with a short-lived presigned GET URL so the
     // frame picker thumbnail can load it directly — frame PNGs live in a
     // private R2 bucket, not a public one.
     const framesWithUrls = await Promise.all(
-      frames.map(async (f) => ({ ...f, objectKey: await getPresignedGetUrl(f.objectKey) })),
-    )
-    return { event, frames: framesWithUrls }
-  })
+      frames.map(async (f) => ({
+        ...f,
+        objectKey: await getPresignedGetUrl(f.objectKey),
+      })),
+    );
+    return { event, frames: framesWithUrls };
+  });
 
-export const Route = createFileRoute('/e/$eventSlug/')({
-  loader: async ({ params }) => getGuestLandingDataFn({ data: params.eventSlug }),
+export const Route = createFileRoute("/e/$eventSlug/")({
+  loader: async ({ params }) =>
+    getGuestLandingDataFn({ data: params.eventSlug }),
   component: GuestLandingPage,
-})
+});
 
-type Step = 'name' | 'frame' | 'capture'
+type Step = "name" | "frame" | "capture";
 
 function GuestLandingPage() {
-  const { event, frames } = Route.useLoaderData()
-  const [step, setStep] = useState<Step>('name')
-  const [guestName, setGuestName] = useState('')
-  const [frameId, setFrameId] = useState<string | null>(null)
+  const { event, frames } = Route.useLoaderData();
+  const [step, setStep] = useState<Step>("name");
+  const [guestName, setGuestName] = useState("");
+  const [frameId, setFrameId] = useState<string | null>(null);
 
   if (!event) {
     return (
       <div className="bg-(--color-surface) min-h-screen flex items-center justify-center p-8 text-center">
-        <p className="text-(--color-on-surface)">Acara ini tidak lagi tersedia.</p>
+        <p className="text-(--color-on-surface)">
+          Acara ini tidak lagi tersedia.
+        </p>
       </div>
-    )
+    );
   }
 
-  if (step === 'name') {
+  if (step === "name") {
     return (
       <GuestNameForm
         onSubmit={(name) => {
-          setGuestName(name)
-          setStep('frame')
+          setGuestName(name);
+          setStep("frame");
         }}
       />
-    )
+    );
   }
 
-  if (step === 'frame') {
+  if (step === "frame") {
     return (
       <FramePicker
         frames={frames}
         value={frameId}
         onChange={(id) => {
-          setFrameId(id)
-          setStep('capture')
+          setFrameId(id);
+          setStep("capture");
         }}
-        onSkip={() => setStep('capture')}
+        onSkip={() => setStep("capture")}
       />
-    )
+    );
   }
 
   // step === 'capture'
-  const selectedFrame = frames.find((f) => f.id === frameId)
+  const selectedFrame = frames.find((f) => f.id === frameId);
   return (
     <CaptureStep
       eventId={event.id}
@@ -97,10 +103,10 @@ function GuestLandingPage() {
       frameId={frameId}
       frameUrl={selectedFrame?.objectKey ?? null}
     />
-  )
+  );
 }
 
-type CaptureSubStep = 'photo' | 'audio' | 'preview'
+type CaptureSubStep = "photo" | "audio" | "preview";
 
 /**
  * Sequences camera capture -> audio recording -> preview/submit for a
@@ -122,100 +128,118 @@ function CaptureStep({
   frameId,
   frameUrl,
 }: {
-  eventId: string
-  eventSlug: string
-  guestName: string
-  frameId: string | null
-  frameUrl: string | null
+  eventId: string;
+  eventSlug: string;
+  guestName: string;
+  frameId: string | null;
+  frameUrl: string | null;
 }) {
-  const navigate = useNavigate()
-  const [subStep, setSubStep] = useState<CaptureSubStep>('photo')
-  const [photoBlob, setPhotoBlob] = useState<Blob | null>(null)
-  const [compositedBlob, setCompositedBlob] = useState<Blob | null>(null)
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
-  const [audioMimeType, setAudioMimeType] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const [subStep, setSubStep] = useState<CaptureSubStep>("photo");
+  const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
+  const [compositedBlob, setCompositedBlob] = useState<Blob | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioMimeType, setAudioMimeType] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handlePhotoCapture(blob: Blob) {
-    setPhotoBlob(blob)
+    setPhotoBlob(blob);
     try {
-      const composited = await compositePhotoWithFrame(blob, frameUrl)
-      setCompositedBlob(composited)
+      const composited = await compositePhotoWithFrame(blob, frameUrl);
+      setCompositedBlob(composited);
     } catch (err) {
-      console.error('Frame compositing failed, falling back to unframed photo:', err)
-      setCompositedBlob(null)
+      console.error(
+        "Frame compositing failed, falling back to unframed photo:",
+        err,
+      );
+      setCompositedBlob(null);
     }
-    setSubStep('audio')
+    setSubStep("audio");
   }
 
   function handleAudioRecorded(blob: Blob, mimeType: string) {
-    setAudioBlob(blob)
-    setAudioMimeType(mimeType)
-    setAudioUrl(URL.createObjectURL(blob))
-    setSubStep('preview')
+    setAudioBlob(blob);
+    setAudioMimeType(mimeType);
+    setAudioUrl(URL.createObjectURL(blob));
+    setSubStep("preview");
   }
 
   function handleRetakePhoto() {
-    setPhotoBlob(null)
-    setCompositedBlob(null)
-    setSubStep('photo')
+    setPhotoBlob(null);
+    setCompositedBlob(null);
+    setSubStep("photo");
   }
 
   function handleReRecordAudio() {
-    setAudioBlob(null)
-    setAudioUrl(null)
-    setSubStep('audio')
+    setAudioBlob(null);
+    setAudioUrl(null);
+    setSubStep("audio");
   }
 
   function handleSkipAudio() {
-    setAudioBlob(null)
-    setAudioUrl(null)
-    setAudioMimeType('')
-    setSubStep('preview')
+    setAudioBlob(null);
+    setAudioUrl(null);
+    setAudioMimeType("");
+    setSubStep("preview");
   }
 
   function handleDownloadPhoto() {
-    if (!compositedBlob) return
-    const url = URL.createObjectURL(compositedBlob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'wedding-moment.jpg'
-    a.click()
-    URL.revokeObjectURL(url)
+    if (!compositedBlob) return;
+    const url = URL.createObjectURL(compositedBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "wedding-moment.jpg";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async function uploadToR2(
-    kind: 'submission-photo' | 'submission-audio',
+    kind: "submission-photo" | "submission-audio",
     submissionId: string,
     blob: Blob,
     contentType: string,
     ext?: string,
   ) {
-    const presignRes = await fetch('/api/uploads/presign', {
-      method: 'POST',
+    const presignRes = await fetch("/api/uploads/presign", {
+      method: "POST",
       body: JSON.stringify({ kind, eventId, submissionId, contentType, ext }),
-    })
-    if (!presignRes.ok) throw new Error('Gagal mendapatkan izin unggah.')
-    const { url, key } = await presignRes.json()
-    const putRes = await fetch(url, { method: 'PUT', body: blob, headers: { 'Content-Type': contentType } })
-    if (!putRes.ok) throw new Error('Gagal mengunggah berkas.')
-    return key
+    });
+    if (!presignRes.ok) throw new Error("Gagal mendapatkan izin unggah.");
+    const { url, key } = await presignRes.json();
+    const putRes = await fetch(url, {
+      method: "PUT",
+      body: blob,
+      headers: { "Content-Type": contentType },
+    });
+    if (!putRes.ok) throw new Error("Gagal mengunggah berkas.");
+    return key;
   }
 
   async function handleSubmit() {
-    if (!compositedBlob) return
-    setSubmitting(true)
-    setError(null)
+    if (!compositedBlob) return;
+    setSubmitting(true);
+    setError(null);
     try {
-      const submissionId = nanoid(12)
-      const photoKey = await uploadToR2('submission-photo', submissionId, compositedBlob, 'image/jpeg')
-      let audioKey: string | null = null
+      const submissionId = nanoid(12);
+      const photoKey = await uploadToR2(
+        "submission-photo",
+        submissionId,
+        compositedBlob,
+        "image/jpeg",
+      );
+      let audioKey: string | null = null;
       if (audioBlob) {
-        const ext = extensionForMimeType(audioMimeType)
-        const audioContentType = audioMimeType || 'audio/webm'
-        audioKey = await uploadToR2('submission-audio', submissionId, audioBlob, audioContentType, ext)
+        const ext = extensionForMimeType(audioMimeType);
+        const audioContentType = audioMimeType || "audio/webm";
+        audioKey = await uploadToR2(
+          "submission-audio",
+          submissionId,
+          audioBlob,
+          audioContentType,
+          ext,
+        );
       }
 
       await createSubmissionFn({
@@ -226,18 +250,25 @@ function CaptureStep({
           photoObjectKey: photoKey,
           audioObjectKey: audioKey,
         },
-      })
+      });
 
-      navigate({ to: '/e/$eventSlug/thank-you', params: { eventSlug } })
+      navigate({ to: "/e/$eventSlug/thank-you", params: { eventSlug } });
     } catch {
-      setError('Gagal mengirim. Silakan coba lagi.')
+      setError("Gagal mengirim. Silakan coba lagi.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
-  if (subStep === 'photo') return <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />
-  if (subStep === 'audio') return <AudioRecorder onRecorded={handleAudioRecorded} onSkip={handleSkipAudio} />
+  if (subStep === "photo")
+    return <CameraCapture onCapture={handlePhotoCapture} frameUrl={frameUrl} />;
+  if (subStep === "audio")
+    return (
+      <AudioRecorder
+        onRecorded={handleAudioRecorded}
+        onSkip={handleSkipAudio}
+      />
+    );
 
   return (
     <div>
@@ -249,8 +280,12 @@ function CaptureStep({
         onDownloadPhoto={handleDownloadPhoto}
         onSubmit={handleSubmit}
       />
-      {submitting && <p className="text-center text-(--color-on-surface-variant)">Mengirim...</p>}
+      {submitting && (
+        <p className="text-center text-(--color-on-surface-variant)">
+          Mengirim...
+        </p>
+      )}
       {error && <p className="text-center text-red-600">{error}</p>}
     </div>
-  )
+  );
 }
